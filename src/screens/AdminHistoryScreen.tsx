@@ -1,5 +1,6 @@
 import { useState, Fragment } from 'react'
 import NavBar from '../components/NavBar'
+import AdminSidebar from '../components/AdminSidebar'
 import { C } from '../colors'
 import type { Screen } from '../App'
 
@@ -28,19 +29,19 @@ const rows = [
   { datetime: 'Jul 22, 2026, 09:14 AM', proofreader: 'Dhivya',   master: '→ 2 files',       revised: '→ 2 files',        mode: 'BULK',   pairs: 2, skipped: 0, findings: 7,  workflow: 'VISUAL COMPARISON', status: 'PASS', expandable: true  },
   { datetime: 'Jul 22, 2026, 08:30 AM', proofreader: 'Ananya',   master: '→ 2 files',       revised: '→ 2 files',        mode: 'BULK',   pairs: 2, skipped: 0, findings: 4,  workflow: 'VISUAL COMPARISON', status: 'PASS', expandable: true  },
   { datetime: 'Jul 21, 2026, 11:52 AM', proofreader: 'Athmika',  master: '→ 2 files',       revised: '→ 2 files',        mode: 'BULK',   pairs: 2, skipped: 0, findings: 12, workflow: 'VISUAL COMPARISON', status: 'PASS', expandable: true  },
-  { datetime: 'Jul 21, 2026, 10:28 AM', proofreader: 'Dhivya',   master: 'Master.pdf',      revised: 'Revised.pdf',      mode: 'SINGLE', pairs: 1, skipped: 0, findings: 3,  workflow: 'PROOF READING',     status: 'PASS', expandable: false },
-  { datetime: 'Jul 21, 2026, 09:15 AM', proofreader: 'Vikram',   master: 'LCN-label.pdf',   revised: 'LCN-label-v2.pdf', mode: 'SINGLE', pairs: 1, skipped: 0, findings: 6,  workflow: 'PROOF READING',     status: 'PASS', expandable: false },
+  { datetime: 'Jul 21, 2026, 10:28 AM', proofreader: 'Dhivya',   master: 'Master.pdf',      revised: 'Revised.pdf',      mode: 'SINGLE', pairs: 1,  skipped: 0, findings: 3,  workflow: 'PROOF READING',     status: 'PASS', expandable: false },
+  { datetime: 'Jul 21, 2026, 09:15 AM', proofreader: 'Vikram',   master: 'LCN-label.pdf',   revised: 'LCN-label-v2.pdf', mode: 'SINGLE', pairs: 1,  skipped: 0, findings: 6,  workflow: 'PROOF READING',     status: 'PASS', expandable: false },
   { datetime: 'Jul 20, 2026, 03:12 PM', proofreader: 'Shrvaani', master: '→ 2 files',       revised: '→ 2 files',        mode: 'BULK',   pairs: 2, skipped: 0, findings: 0,  workflow: 'VISUAL COMPARISON', status: 'PASS', expandable: true  },
-  { datetime: 'Jul 20, 2026, 01:45 PM', proofreader: 'Priya',    master: 'Master.pdf',      revised: 'Revised.pdf',      mode: 'SINGLE', pairs: 1, skipped: 0, findings: 2,  workflow: 'PROOF READING',     status: 'PASS', expandable: false },
-  { datetime: 'Jul 19, 2026, 08:44 AM', proofreader: 'Rooban',   master: 'LCN-label.pdf',   revised: 'LCN-label-v2.pdf', mode: 'SINGLE', pairs: 1, skipped: 0, findings: 5,  workflow: 'PROOF READING',     status: 'PASS', expandable: false },
-  { datetime: 'Jul 18, 2026, 02:30 PM', proofreader: 'Parvatha', master: '→ 3 files',       revised: '→ 3 files',        mode: 'BULK',   pairs: 3, skipped: 0, findings: 18, workflow: 'VISUAL COMPARISON', status: 'PASS', expandable: true  },
+  { datetime: 'Jul 20, 2026, 01:45 PM', proofreader: 'Priya',    master: 'Master.pdf',      revised: 'Revised.pdf',      mode: 'SINGLE', pairs: 1,  skipped: 0, findings: 2,  workflow: 'PROOF READING',     status: 'PASS', expandable: false },
+  { datetime: 'Jul 19, 2026, 08:44 AM', proofreader: 'Rooban',   master: 'LCN-label.pdf',   revised: 'LCN-label-v2.pdf', mode: 'SINGLE', pairs: 1,  skipped: 0, findings: 5,  workflow: 'PROOF READING',     status: 'PASS', expandable: false },
+  { datetime: 'Jul 18, 2026, 02:30 PM', proofreader: 'Parvatha', master: '→ 2 files',       revised: '→ 2 files',        mode: 'BULK',   pairs: 2, skipped: 0, findings: 18, workflow: 'VISUAL COMPARISON', status: 'PASS', expandable: true  },
   { datetime: 'Jul 17, 2026, 08:17 PM', proofreader: 'Dhivya',   master: '→ 2 files',       revised: '→ 2 files',        mode: 'BULK',   pairs: 2, skipped: 1, findings: 4,  workflow: 'VISUAL COMPARISON', status: 'PASS', expandable: true  },
 ]
 
-const bulkFiles = [
-  { name: 'additional changes master.pdf', size: '475.0 KB' },
-  { name: 'secondary label master.pdf', size: '312.4 KB' },
-]
+const bulkFiles = Array.from({ length: 20 }, (_, i) => ({
+  name: `Label_${String(i + 1).padStart(2, '0')}_Master.pdf`,
+  size: `${(280 + Math.floor(Math.sin(i) * 80 + 80)).toFixed(1)} KB`
+}))
 
 export default function AdminHistoryScreen({
   onNavigate,
@@ -81,12 +82,6 @@ export default function AdminHistoryScreen({
   return (
     <div className="flex flex-col h-screen overflow-hidden animate-fade-in" style={{ backgroundColor: C.bg }}>
       <NavBar
-        showBack
-        onBack={() => onNavigate(
-          previousScreen === 'team-members' ? 'team-members' :
-          previousScreen === 'proofreader-dashboard' ? 'proofreader-dashboard' :
-          isWorkspaceAdmin ? 'workspace-admin-dashboard' : 'admin-dashboard'
-        )}
         title="Run History"
         showProfile
         onProfileClick={() => onNavigate('profile')}
@@ -118,8 +113,10 @@ export default function AdminHistoryScreen({
         }
       />
 
-      {/* Main scrollable content area */}
-      <div className="flex-1 overflow-y-auto w-full">
+      {/* Main layout with sidebar */}
+      <div className="flex flex-1 overflow-hidden">
+      <AdminSidebar active="history" userRole={isWorkspaceAdmin ? 'workspace-admin' : 'admin'} onNavigate={onNavigate} />
+      <div className="flex-1 overflow-y-auto">
       <div className="px-8 py-8 flex flex-col gap-5 w-full" style={{ maxWidth: 1300, margin: '0 auto' }}>
         <div className="flex items-center justify-between mb-2">
           <div>
@@ -255,8 +252,9 @@ export default function AdminHistoryScreen({
                       <td className="px-3 py-3">
                         <button
                           onClick={() => {
-                            const file = row.mode === 'BULK' ? '/ProofX_Bulk_Report.pdf' : '/ProofX_Report.pdf'
-                            const name = row.mode === 'BULK' ? 'ProofX_Bulk_Report.pdf' : 'ProofX_Report.pdf'
+                            const isLrfBulk = row.mode === 'BULK' && row.workflow === 'PROOF READING'
+                            const file = isLrfBulk ? '/ProofX_Bulk_LRF_Report.pdf' : row.mode === 'BULK' ? '/ProofX_Bulk_Report.pdf' : '/ProofX_Report.pdf'
+                            const name = isLrfBulk ? 'ProofX_Bulk_LRF_Report.pdf' : row.mode === 'BULK' ? 'ProofX_Bulk_Report.pdf' : 'ProofX_Report.pdf'
                             const a = document.createElement('a')
                             a.href = file
                             a.download = name
@@ -332,10 +330,8 @@ export default function AdminHistoryScreen({
         </div>
       </div>
       </div>
+      </div>
 
-      <footer className="text-center py-4 shrink-0">
-        <p className="text-xs" style={{ color: C.muted }}>ProofX · Label Compliance</p>
-      </footer>
     </div>
   )
 }

@@ -1,5 +1,6 @@
 import { useState, ReactNode } from 'react'
 import NavBar from '../components/NavBar'
+import AdminSidebar from '../components/AdminSidebar'
 import { C } from '../colors'
 import type { Screen } from '../App'
 
@@ -58,11 +59,11 @@ const flashCards = [
 ]
 
 const historyRows = [
-  { datetime: 'Jul 22, 2026, 09:14 AM', proofreader: 'Dhivya', master: '→ 2 files', revised: '→ 2 files', mode: 'BULK', pairs: 2, findings: 7, workflow: 'VISUAL COMPARISON', status: 'PASS' },
-  { datetime: 'Jul 21, 2026, 11:52 AM', proofreader: 'Athmika', master: '→ 2 files', revised: '→ 2 files', mode: 'BULK', pairs: 2, findings: 12, workflow: 'VISUAL COMPARISON', status: 'PASS' },
-  { datetime: 'Jul 21, 2026, 10:28 AM', proofreader: 'Dhivya', master: 'Master.pdf', revised: 'Revised.pdf', mode: 'SINGLE', pairs: 1, findings: 3, workflow: 'PROOF READING', status: 'PASS' },
-  { datetime: 'Jul 20, 2026, 03:12 PM', proofreader: 'Shrvaani', master: '→ 2 files', revised: '→ 2 files', mode: 'BULK', pairs: 2, findings: 0, workflow: 'VISUAL COMPARISON', status: 'PASS' },
-  { datetime: 'Jul 19, 2026, 08:44 AM', proofreader: 'Rooban', master: 'LCN-label.pdf', revised: 'LCN-label-v2.pdf', mode: 'SINGLE', pairs: 1, findings: 5, workflow: 'PROOF READING', status: 'PASS' },
+  { datetime: 'Jul 22, 2026, 09:14 AM', proofreader: 'Dhivya',   master: '→ 2 files', revised: '→ 2 files', mode: 'BULK',   pairs: 2, findings: 7,  workflow: 'VISUAL COMPARISON', status: 'PASS' },
+  { datetime: 'Jul 21, 2026, 11:52 AM', proofreader: 'Athmika',  master: '→ 2 files', revised: '→ 2 files', mode: 'BULK',   pairs: 2, findings: 12, workflow: 'VISUAL COMPARISON', status: 'PASS' },
+  { datetime: 'Jul 21, 2026, 10:28 AM', proofreader: 'Dhivya',   master: 'Master.pdf',  revised: 'Revised.pdf', mode: 'SINGLE', pairs: 1,  findings: 3,  workflow: 'PROOF READING',     status: 'PASS' },
+  { datetime: 'Jul 20, 2026, 03:12 PM', proofreader: 'Shrvaani', master: '→ 2 files', revised: '→ 2 files', mode: 'BULK',   pairs: 2, findings: 0,  workflow: 'VISUAL COMPARISON', status: 'PASS' },
+  { datetime: 'Jul 19, 2026, 08:44 AM', proofreader: 'Rooban',   master: 'LCN-label.pdf', revised: 'LCN-label-v2.pdf', mode: 'SINGLE', pairs: 1, findings: 5, workflow: 'PROOF READING', status: 'PASS' },
 ]
 
 const analyticsData = [
@@ -136,7 +137,9 @@ export default function WorkspaceAdminDashboardScreen({ onNavigate, onSelectProo
         profileInitials="D"
       />
 
-      <div className="flex-1 overflow-y-auto w-full">
+      <div className="flex flex-1 overflow-hidden">
+      <AdminSidebar active="dashboard" userRole="workspace-admin" onNavigate={onNavigate} />
+      <div className="flex-1 overflow-y-auto">
       <div className="px-8 py-8 flex flex-col gap-6 w-full" style={{ maxWidth: 1200, margin: '0 auto' }}>
         {/* Header */}
         <div className="flex justify-between items-center">
@@ -424,7 +427,8 @@ export default function WorkspaceAdminDashboardScreen({ onNavigate, onSelectProo
                             </button>
                             <button
                               onClick={() => {
-                                const file = row.mode === 'BULK' ? '/ProofX_Bulk_Report.pdf' : '/ProofX_Report.pdf'
+                                const isLrfBulk = row.mode === 'BULK' && row.workflow === 'PROOF READING'
+                                const file = isLrfBulk ? '/ProofX_Bulk_LRF_Report.pdf' : row.mode === 'BULK' ? '/ProofX_Bulk_Report.pdf' : '/ProofX_Report.pdf'
                                 const a = document.createElement('a')
                                 a.href = file
                                 a.download = file.split('/').pop()!
@@ -480,10 +484,8 @@ export default function WorkspaceAdminDashboardScreen({ onNavigate, onSelectProo
         </div>
       </div>
       </div>
+      </div>
 
-      <footer className="text-center py-4 shrink-0">
-        <p className="text-xs" style={{ color: C.muted }}>ProofX · Label Compliance</p>
-      </footer>
     </div>
   )
 }

@@ -1,4 +1,5 @@
 import NavBar from '../components/NavBar'
+import ProofreaderSidebar from '../components/ProofreaderSidebar'
 import { FileText, ClipboardList, CheckCircle2, ArrowRight } from 'lucide-react'
 import { C } from '../colors'
 import type { Screen } from '../App'
@@ -367,8 +368,9 @@ export default function ProofreaderDashboardScreen({ onNavigate, onSetLrfFlowAct
                           {run.status === 'PASS' ? (
                             <button
                               onClick={() => {
-                                const file = run.mode === 'BULK' ? '/ProofX_Bulk_Report.pdf' : '/ProofX_Report.pdf'
-                                const name = run.mode === 'BULK' ? 'ProofX_Bulk_Report.pdf' : 'ProofX_Report.pdf'
+                                const isLrfBulk = run.mode === 'BULK' && run.workflow === 'PROOF READING'
+                                const file = isLrfBulk ? '/ProofX_Bulk_LRF_Report.pdf' : run.mode === 'BULK' ? '/ProofX_Bulk_Report.pdf' : '/ProofX_Report.pdf'
+                                const name = isLrfBulk ? 'ProofX_Bulk_LRF_Report.pdf' : run.mode === 'BULK' ? 'ProofX_Bulk_Report.pdf' : 'ProofX_Report.pdf'
                                 const a = document.createElement('a')
                                 a.href = file
                                 a.download = name

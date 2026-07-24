@@ -10,7 +10,8 @@ export default function ProfileScreen({ onNavigate, role = 'admin', previousScre
   const defaultEmail = role === 'admin' ? 'admin@proofx.com' : role === 'workspace-admin' ? 'dhivya@novintix.com' : 'athmika@proofx.com'
   const [name, setName] = useState(defaultName)
   const [email, setEmail] = useState(defaultEmail)
-  const [showPasswordFields, setShowPasswordFields] = useState(true)
+  const [showPasswordFields, setShowPasswordFields] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
   const [oldPassword, setOldPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -19,6 +20,7 @@ export default function ProfileScreen({ onNavigate, role = 'admin', previousScre
   const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
 
   const handleSave = () => {
+    setIsEditing(false)
     setSaved(true)
     setTimeout(() => setSaved(false), 3000)
   }
@@ -53,17 +55,27 @@ export default function ProfileScreen({ onNavigate, role = 'admin', previousScre
             className="flex flex-col items-center py-8 relative"
             style={{ background: `linear-gradient(160deg, ${C.navy} 0%, #253480 100%)` }}
           >
-            {/* Top right icon */}
-            <div className="absolute top-4 right-4 flex gap-2">
-              <div 
-                title="Verified Proofreader"
-                className="p-1.5 rounded-full text-white/90 bg-white/10 border border-white/20 transition-all hover:bg-white/20 cursor-pointer"
-              >
-                <svg className="w-5 h-5 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.339 16.671 2 12.226 2 7c0-.68.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+            {/* Top right edit icon */}
+            <button
+              onClick={() => setIsEditing(e => !e)}
+              title={isEditing ? 'Cancel editing' : 'Edit profile'}
+              className="absolute top-4 right-4 p-2 rounded-full border transition-all cursor-pointer"
+              style={{
+                backgroundColor: isEditing ? 'rgba(242,128,29,0.2)' : 'rgba(255,255,255,0.1)',
+                borderColor: isEditing ? C.orange : 'rgba(255,255,255,0.2)',
+              }}
+            >
+              {isEditing ? (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M6 18L18 6M6 6l12 12" stroke="white" strokeWidth="2" strokeLinecap="round" />
                 </svg>
-              </div>
-            </div>
+              ) : (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              )}
+            </button>
             <div
               className="flex items-center justify-center rounded-full font-bold text-white mb-3"
               style={{ width: 72, height: 72, backgroundColor: 'rgba(255,255,255,0.18)', fontSize: 24, border: '3px solid rgba(255,255,255,0.3)' }}
@@ -87,23 +99,42 @@ export default function ProfileScreen({ onNavigate, role = 'admin', previousScre
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold mb-1.5" style={{ color: C.text }}>Full name</label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={e => setName(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-lg text-sm"
-                  style={{ border: `1px solid ${C.border}`, color: C.text, backgroundColor: C.white }}
-                />
+                {isEditing ? (
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={e => setName(e.target.value)}
+                    autoFocus
+                    className="w-full px-3 py-2.5 rounded-lg text-sm"
+                    style={{ border: `1.5px solid ${C.orange}`, color: C.text, backgroundColor: C.white, outline: 'none' }}
+                  />
+                ) : (
+                  <div
+                    className="w-full px-3 py-2.5 rounded-lg text-sm"
+                    style={{ border: `1px solid ${C.border}`, color: C.text, backgroundColor: C.grayBg }}
+                  >
+                    {name}
+                  </div>
+                )}
               </div>
               <div>
                 <label className="block text-xs font-semibold mb-1.5" style={{ color: C.text }}>Email</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-lg text-sm"
-                  style={{ border: `1px solid ${C.border}`, color: C.text, backgroundColor: C.white }}
-                />
+                {isEditing ? (
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    className="w-full px-3 py-2.5 rounded-lg text-sm"
+                    style={{ border: `1.5px solid ${C.orange}`, color: C.text, backgroundColor: C.white, outline: 'none' }}
+                  />
+                ) : (
+                  <div
+                    className="w-full px-3 py-2.5 rounded-lg text-sm"
+                    style={{ border: `1px solid ${C.border}`, color: C.text, backgroundColor: C.grayBg }}
+                  >
+                    {email}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -156,7 +187,7 @@ export default function ProfileScreen({ onNavigate, role = 'admin', previousScre
                       className="px-3 py-2.5 rounded-lg flex items-center gap-2"
                       style={{ backgroundColor: C.grayBg, border: `1px solid ${C.border}` }}
                     >
-                      <span className="w-2 h-2 rounded-full" style={{ backgroundColor: C.navy }}></span>
+                      <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: C.navy }}></span>
                       <span className="text-xs font-bold" style={{ color: C.navy }}>Workspace Scope</span>
                     </div>
                   </div>

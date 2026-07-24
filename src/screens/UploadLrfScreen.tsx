@@ -127,14 +127,15 @@ export default function UploadLrfScreen({ lrfData, onNavigate, onSetLrfFlowActiv
   useEffect(() => {
     if (!modalPhase) return;
 
+    const actualPairCount = mode === 'bulk' ? pairCount : 1;
+
     if (modalPhase.type === 'preprocessing') {
-      const isTwoPairs = mode === 'bulk' && master?.name === 'Master.pdf';
       if (modalPhase.step < PRE_STEPS.length - 1) {
         const t = setTimeout(() => setModalPhase({ type: 'preprocessing', pairIndex: modalPhase.pairIndex, step: modalPhase.step + 1 }), 900);
         return () => clearTimeout(t);
       } else {
-        if (isTwoPairs && modalPhase.pairIndex === 1) {
-          const t = setTimeout(() => setModalPhase({ type: 'preprocessing', pairIndex: 2, step: 0 }), 900);
+        if (modalPhase.pairIndex < actualPairCount) {
+          const t = setTimeout(() => setModalPhase({ type: 'preprocessing', pairIndex: modalPhase.pairIndex + 1, step: 0 }), 900);
           return () => clearTimeout(t);
         } else {
           const t = setTimeout(() => setModalPhase({ type: 'preprocessing-complete' }), 900);
@@ -144,13 +145,12 @@ export default function UploadLrfScreen({ lrfData, onNavigate, onSetLrfFlowActiv
     }
 
     if (modalPhase.type === 'analysing') {
-      const isTwoPairs = mode === 'bulk' && master?.name === 'Master.pdf';
       if (modalPhase.step < ANALYSIS_STEPS.length - 1) {
         const t = setTimeout(() => setModalPhase({ type: 'analysing', pairIndex: modalPhase.pairIndex, step: modalPhase.step + 1 }), 600);
         return () => clearTimeout(t);
       } else {
-        if (isTwoPairs && modalPhase.pairIndex === 1) {
-          const t = setTimeout(() => setModalPhase({ type: 'analysing', pairIndex: 2, step: 0 }), 700);
+        if (modalPhase.pairIndex < actualPairCount) {
+          const t = setTimeout(() => setModalPhase({ type: 'analysing', pairIndex: modalPhase.pairIndex + 1, step: 0 }), 700);
           return () => clearTimeout(t);
         } else {
           const t = setTimeout(() => {
@@ -162,7 +162,7 @@ export default function UploadLrfScreen({ lrfData, onNavigate, onSetLrfFlowActiv
         }
       }
     }
-  }, [modalPhase, onNavigate, onSetLrfFlowActive, onSetFiles, master, revised, mode]);
+  }, [modalPhase, onNavigate, onSetLrfFlowActive, onSetFiles, master, revised, mode, pairCount]);
 
   const dispatchRun = () => {
     setModalPhase({ type: 'preprocessing', pairIndex: 1, step: 0 });
@@ -170,9 +170,20 @@ export default function UploadLrfScreen({ lrfData, onNavigate, onSetLrfFlowActiv
 
   const handleRun = () => {
     if (!ready) return;
-    if (mode === "bulk" && bulkMismatch) {
-      setShowMismatchDialog(true);
-      return;
+    if (mode === "bulk") {
+      const repMasters: any[] = [];
+      const repRevised: any[] = [];
+      const masterSrc = { name: 'Master.pdf', size: 486400, url: '#', file: new File([], 'Master.pdf') };
+      const revisedSrc = { name: 'Revised.pdf', size: 478412, url: '#', file: new File([], 'Revised.pdf') };
+      const addMasterSrc = { name: 'additional changes master.pdf', size: 486400, url: '#', file: new File([], 'master.pdf') };
+      const addRevisedSrc = { name: 'additional changes revised.pdf', size: 478412, url: '#', file: new File([], 'revised.pdf') };
+      for (let i = 0; i < 20; i++) {
+        const isEven = i % 2 === 0;
+        repMasters.push(isEven ? { ...masterSrc } : { ...addMasterSrc });
+        repRevised.push(isEven ? { ...revisedSrc } : { ...addRevisedSrc });
+      }
+      setBulkMasters(repMasters);
+      setBulkRevised(repRevised);
     }
     dispatchRun();
   };
@@ -202,14 +213,19 @@ export default function UploadLrfScreen({ lrfData, onNavigate, onSetLrfFlowActiv
         setRevised({ name: 'Revised.pdf', size: 478412, url: '#', file: new File([], 'Revised.pdf') });
       }
     } else {
-      setBulkMasters([
-        { name: 'Label_A_Master.pdf', size: 312000, url: '#', file: new File([], 'Label_A_Master.pdf') },
-        { name: 'Label_B_Master.pdf', size: 284000, url: '#', file: new File([], 'Label_B_Master.pdf') }
-      ]);
-      setBulkRevised([
-        { name: 'Label_A_Revised.pdf', size: 309000, url: '#', file: new File([], 'Label_A_Revised.pdf') },
-        { name: 'Label_B_Revised.pdf', size: 282000, url: '#', file: new File([], 'Label_B_Revised.pdf') }
-      ]);
+      const masterSrc = { name: 'Master.pdf', size: 486400, url: '#', file: new File([], 'Master.pdf') };
+      const revisedSrc = { name: 'Revised.pdf', size: 478412, url: '#', file: new File([], 'Revised.pdf') };
+      const addMasterSrc = { name: 'additional changes master.pdf', size: 486400, url: '#', file: new File([], 'master.pdf') };
+      const addRevisedSrc = { name: 'additional changes revised.pdf', size: 478412, url: '#', file: new File([], 'revised.pdf') };
+      const rMasters: any[] = [];
+      const rRevised: any[] = [];
+      for (let i = 0; i < 20; i++) {
+        const isEven = i % 2 === 0;
+        rMasters.push(isEven ? { ...masterSrc } : { ...addMasterSrc });
+        rRevised.push(isEven ? { ...revisedSrc } : { ...addRevisedSrc });
+      }
+      setBulkMasters(rMasters);
+      setBulkRevised(rRevised);
     }
   };
 
@@ -414,7 +430,7 @@ export default function UploadLrfScreen({ lrfData, onNavigate, onSetLrfFlowActiv
                             <td className="px-4 py-2.5 text-xs text-gray-500 font-mono max-w-[120px] truncate" title={c.fromValue}>
                               {c.fromValue || "—"}
                             </td>
-                            <td className="px-4 py-2.5 text-xs text-gray-800 font-semibold font-mono max-w-[120px] truncate" title={c.toValue}>
+                            <td className="px-4 py-2.5 text-xs text-gray-500 font-mono max-w-[120px] truncate" title={c.toValue}>
                               {c.toValue || "—"}
                             </td>
                           </tr>
@@ -451,14 +467,23 @@ export default function UploadLrfScreen({ lrfData, onNavigate, onSetLrfFlowActiv
                         onClick={() => {
                           setMode(m);
                           if (m === "bulk" && bulkMasters.length === 0) {
-                            setBulkMasters([
-                              { name: 'Master.pdf', size: 486400, url: '#', file: new File([], 'Master.pdf'), pageCount: 1 },
-                              { name: 'additional changes master.pdf', size: 486400, url: '#', file: new File([], 'master.pdf'), pageCount: 1 },
-                            ]);
-                            setBulkRevised([
-                              { name: 'Revised.pdf', size: 478412, url: '#', file: new File([], 'Revised.pdf'), pageCount: 1 },
-                              { name: 'additional changes revised.pdf', size: 478412, url: '#', file: new File([], 'revised.pdf'), pageCount: 1 },
-                            ]);
+                            const baseM = [
+                              { name: 'Master.pdf', size: 486400, url: '#', file: new File([], 'Master.pdf'), pageCount: 1 } as any,
+                              { name: 'additional changes master.pdf', size: 486400, url: '#', file: new File([], 'master.pdf'), pageCount: 1 } as any,
+                            ];
+                            const baseR = [
+                              { name: 'Revised.pdf', size: 478412, url: '#', file: new File([], 'Revised.pdf'), pageCount: 1 } as any,
+                              { name: 'additional changes revised.pdf', size: 478412, url: '#', file: new File([], 'revised.pdf'), pageCount: 1 } as any,
+                            ];
+                            const rMasters: any[] = [];
+                            const rRevised: any[] = [];
+                            for (let i = 0; i < 20; i++) {
+                              const isEven = i % 2 === 0;
+                              rMasters.push(isEven ? { ...baseM[0] } : { ...baseM[1] });
+                              rRevised.push(isEven ? { ...baseR[0] } : { ...baseR[1] });
+                            }
+                            setBulkMasters(rMasters);
+                            setBulkRevised(rRevised);
                           }
                           if (m === "single" && !master) {
                             setMaster({ name: 'Master.pdf', size: 486400, url: '#', file: new File([], 'Master.pdf') });
@@ -540,9 +565,9 @@ export default function UploadLrfScreen({ lrfData, onNavigate, onSetLrfFlowActiv
           phase={modalPhase}
           onContinue={handleContinue}
           onReupload={handleReupload}
-          masterName={master?.name ?? 'master.pdf'}
-          revisedName={revised?.name ?? 'revised.pdf'}
-          isBulk={mode === 'bulk'}
+          totalPairs={mode === 'bulk' ? pairCount : 1}
+          masterNames={mode === 'bulk' ? bulkMasters.map(f => f.name) : [master?.name ?? 'Master.pdf']}
+          revisedNames={mode === 'bulk' ? bulkRevised.map(f => f.name) : [revised?.name ?? 'Revised.pdf']}
         />
       )}
     </>
@@ -797,16 +822,16 @@ function ProcessingModal({
   phase,
   onContinue,
   onReupload,
-  masterName,
-  revisedName,
-  isBulk,
+  totalPairs,
+  masterNames,
+  revisedNames,
 }: {
   phase: ModalPhase;
   onContinue: () => void;
   onReupload: () => void;
-  masterName: string;
-  revisedName: string;
-  isBulk: boolean;
+  totalPairs: number;
+  masterNames: string[];
+  revisedNames: string[];
 }) {
   if (!phase) return null;
 
@@ -818,27 +843,22 @@ function ProcessingModal({
   const currentStep = (isPreprocessing || isAnalysing) ? (phase as { type: string; step: number }).step : -1;
   const steps = isAnalysing ? ANALYSIS_STEPS : PRE_STEPS;
 
-  const isTwoPairs = isBulk && masterName === 'Master.pdf';
-  const pairText = isTwoPairs ? '2 pairs' : '1 pair';
-  const pairCount = isTwoPairs ? 2 : 1;
+  const pairText = totalPairs === 1 ? '1 pair' : `${totalPairs} pairs`;
   const title = isAnalysing ? `Analysing ${pairText}` : `Pre-processing ${pairText}`;
 
-  const activePairIndex = (isPreprocessing || isAnalysing) ? (phase as { type: string; pairIndex: number }).pairIndex : (isComplete || isAlert ? pairCount : 1);
-  const activeMaster = isTwoPairs ? (activePairIndex === 1 ? 'Master.pdf' : 'additional changes master.pdf') : masterName;
-  const activeRevised = isTwoPairs ? (activePairIndex === 1 ? 'Revised.pdf' : 'additional changes revised.pdf') : revisedName;
+  const activePairIndex = (isPreprocessing || isAnalysing)
+    ? (phase as { type: string; pairIndex: number }).pairIndex
+    : (isComplete || isAlert ? totalPairs : 1);
 
-  const passedFiles: string[] = [];
-  if (isComplete || isAlert) {
-    passedFiles.push(isTwoPairs ? 'Master.pdf' : masterName);
-    if (isTwoPairs) passedFiles.push('additional changes master.pdf');
-  } else if (isPreprocessing || isAnalysing) {
-    if (activePairIndex === 2) {
-      passedFiles.push(isTwoPairs ? 'Master.pdf' : masterName);
-    }
-  }
+  const activeMaster = masterNames[activePairIndex - 1] ?? masterNames[0];
+  const activeRevised = revisedNames[activePairIndex - 1] ?? revisedNames[0];
 
-  const progressCompleted = (isComplete || isAlert) ? pairCount : (activePairIndex - 1);
-  const progressPercent = Math.round((progressCompleted / pairCount) * 100);
+  const passedFiles: string[] = isComplete || isAlert
+    ? masterNames.slice()
+    : masterNames.slice(0, activePairIndex - 1);
+
+  const progressCompleted = (isComplete || isAlert) ? totalPairs : (activePairIndex - 1);
+  const progressPercent = Math.round((progressCompleted / totalPairs) * 100);
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-[120] bg-black/30 backdrop-blur-[2px]">
@@ -853,13 +873,13 @@ function ProcessingModal({
                 PRE-PROCESSING COMPLETE
               </div>
               <div className="text-xs text-[#5F6368]">
-                {isTwoPairs ? 'Both pages' : 'Page'} passed validation
+                {totalPairs > 1 ? 'All pages' : 'Page'} passed validation
               </div>
             </div>
           </div>
 
           <div className="text-sm text-slate-700 font-medium px-1">
-            {pairCount} {pairCount === 1 ? 'page' : 'pages'} ready to compare.
+            {totalPairs} {totalPairs === 1 ? 'page' : 'pages'} ready to compare.
           </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
@@ -887,9 +907,12 @@ function ProcessingModal({
               <ScanLine className="h-4 w-4 text-[#1C2E59] animate-spin" style={{ animationDuration: "2.2s" }} />
               <span className="text-xs font-bold tracking-tight uppercase text-[#1C2E59]">ProofX</span>
             </div>
-            <div className="text-lg font-semibold text-[#1A1A2E]">
+            <div className="text-lg font-semibold text-[#1A1A2E] mb-2">
               {title}
             </div>
+            <p className="text-[11px] text-[#253e7a] leading-relaxed bg-[#f0f4f8] border border-blue-100 p-2.5 rounded-lg">
+              <strong>Why preprocessing?</strong> We align pages and calibrate image resolution so that differences are detected with pixel-level accuracy.
+            </p>
           </div>
 
           <div className="flex flex-col gap-5">
@@ -975,7 +998,7 @@ function ProcessingModal({
             <div className="space-y-1.5 mt-1">
               <div className="flex justify-between text-xs text-[#5F6368]">
                 <span>Pre-processing</span>
-                <span className="font-medium text-[#1A1A2E]">{progressCompleted} / {pairCount}</span>
+                <span className="font-medium text-[#1A1A2E]">{progressCompleted} / {totalPairs}</span>
               </div>
               <div className="h-1.5 bg-[#F1F3F4] rounded-full overflow-hidden">
                 <div

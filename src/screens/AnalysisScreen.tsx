@@ -11,6 +11,7 @@ type Props = {
   bulkMode?: boolean;
   masterFilename: string;
   revisedFilename: string;
+  historyPreview?: boolean;
 }
 
 type BBox = { x: number; y: number; w: number; h: number }
@@ -351,7 +352,7 @@ function FilterPill({
   )
 }
 
-export default function AnalysisScreen({ onNavigate, previousScreen, lrfFlowActive, bulkMode, masterFilename, revisedFilename }: Props) {
+export default function AnalysisScreen({ onNavigate, previousScreen, lrfFlowActive, bulkMode, masterFilename, revisedFilename, historyPreview }: Props) {
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<'all' | 'text' | 'graphics' | 'barcode'>('all')
   const [activeStatus, setActiveStatus] = useState<'all' | 'expected' | 'unexpected'>('all')
@@ -365,57 +366,108 @@ export default function AnalysisScreen({ onNavigate, previousScreen, lrfFlowActi
   const masterRef = useRef<HTMLDivElement>(null)
   const revisedRef = useRef<HTMLDivElement>(null)
 
-  const isTwoPairs = !!bulkMode && masterFilename === 'Master.pdf';
+  const isTwentyPairs = !!bulkMode && !historyPreview;
+  const isTwoPairs = !!bulkMode && !!historyPreview;
+  const hasSidebar = isTwentyPairs || isTwoPairs;
   const [activePairIdx, setActivePairIdx] = useState(1);
 
+  // Generate pairs list dynamically
+  const bulkPairs = isTwoPairs
+    ? [
+        {
+          idx: 1,
+          master: masterFilename,
+          revised: revisedFilename,
+          actualMaster: masterFilename,
+          actualRevised: revisedFilename,
+          count: newFindingsList.length
+        },
+        {
+          idx: 2,
+          master: 'additional changes master.pdf',
+          revised: 'additional changes revised.pdf',
+          actualMaster: 'additional changes master.pdf',
+          actualRevised: 'additional changes revised.pdf',
+          count: findings.length
+        }
+      ]
+    : Array.from({ length: 20 }, (_, i) => {
+        const isEven = i % 2 === 0;
+        const mName = isEven ? 'Master.pdf' : 'additional changes master.pdf';
+        const rName = isEven ? 'Revised.pdf' : 'additional changes revised.pdf';
+        const count = isEven ? newFindingsList.length : findings.length;
+        return {
+          idx: i + 1,
+          master: mName,
+          revised: rName,
+          actualMaster: mName,
+          actualRevised: rName,
+          count
+        };
+      });
+
+  const currentPair = hasSidebar ? bulkPairs[activePairIdx - 1] : null;
+
   // Determine actual files and paths being displayed
-  const isMasterPdf = isTwoPairs ? activePairIdx === 2 : masterFilename !== 'Master.pdf';
+  const isMasterPdf = currentPair ? (currentPair.actualMaster !== 'Master.pdf') : (masterFilename !== 'Master.pdf');
   const activeFindingsList = isMasterPdf ? findings : newFindingsList;
-  const activeMasterName = isTwoPairs ? (isMasterPdf ? 'additional changes master.pdf' : 'Master.pdf') : masterFilename;
-  const activeRevisedName = isTwoPairs ? (isMasterPdf ? 'additional changes revised.pdf' : 'Revised.pdf') : revisedFilename;
+  const activeMasterName = currentPair ? currentPair.master : masterFilename;
+  const activeRevisedName = currentPair ? currentPair.revised : revisedFilename;
   const masterPdfPath = isMasterPdf ? '/labels/additional changes master.png' : '/labels/Master.png';
   const revisedPdfPath = isMasterPdf ? '/labels/additional changes revised.png' : '/labels/Revised.png';
 
   // Every label pair starts loading at the same time (no click needed); each pair
   // tracks its own progress and stays disabled until its own load completes.
   // This simulation only applies in bulk mode — single-pair mode renders immediately.
-  const [pairLoadState, setPairLoadState] = useState<Record<number, { loading: boolean; progress: number }>>(() => (
-    isTwoPairs
-      ? { 1: { loading: true, progress: 0 }, 2: { loading: true, progress: 0 } }
-      : { 1: { loading: false, progress: 100 }, 2: { loading: false, progress: 100 } }
-  ))
+  const [pairLoadState, setPairLoadState] = useState<Record<number, { loading: boolean; progress: number }>>(() => {
+    if (isTwentyPairs) {
+      const state: Record<number, { loading: boolean; progress: number }> = {};
+      for (let i = 1; i <= 20; i++) {
+        state[i] = { loading: true, progress: 0 };
+      }
+      return state;
+    }
+    if (isTwoPairs) {
+      return {
+        1: { loading: false, progress: 100 },
+        2: { loading: false, progress: 100 }
+      };
+    }
+    return { 1: { loading: false, progress: 100 } };
+  });
 
   useEffect(() => {
-    if (!isTwoPairs) return
-    let cancelled = false
-    const timeouts: ReturnType<typeof setTimeout>[] = []
+    if (!isTwentyPairs) return;
+    let cancelled = false;
+    const timeouts: ReturnType<typeof setTimeout>[] = [];
 
     const runLoad = (idx: number, steps: number, stepDelay: number, startDelay: number) => {
       const step = (n: number) => {
-        if (cancelled) return
+        if (cancelled) return;
         if (n > steps) {
-          setPairLoadState(prev => ({ ...prev, [idx]: { loading: true, progress: 100 } }))
+          setPairLoadState(prev => ({ ...prev, [idx]: { loading: true, progress: 100 } }));
           timeouts.push(setTimeout(() => {
-            if (cancelled) return
-            setPairLoadState(prev => ({ ...prev, [idx]: { loading: false, progress: 100 } }))
-          }, 200))
-          return
+            if (cancelled) return;
+            setPairLoadState(prev => ({ ...prev, [idx]: { loading: false, progress: 100 } }));
+          }, 200));
+          return;
         }
-        setPairLoadState(prev => ({ ...prev, [idx]: { loading: true, progress: Math.round((n / steps) * 100) } }))
-        timeouts.push(setTimeout(() => step(n + 1), stepDelay))
-      }
-      timeouts.push(setTimeout(() => step(1), startDelay))
-    }
+        setPairLoadState(prev => ({ ...prev, [idx]: { loading: true, progress: Math.round((n / steps) * 100) } }));
+        timeouts.push(setTimeout(() => step(n + 1), stepDelay));
+      };
+      timeouts.push(setTimeout(() => step(1), startDelay));
+    };
 
-    // Second pair starts noticeably later than the first.
-    runLoad(1, 20, 150, 0)
-    runLoad(2, 20, 150, 1800)
+    // Stagger loading of all 20 pairs - 30 steps, 150ms per step, staggered by 800ms
+    for (let i = 1; i <= 20; i++) {
+      runLoad(i, 30, 150, (i - 1) * 800);
+    }
 
     return () => {
-      cancelled = true
-      timeouts.forEach(clearTimeout)
-    }
-  }, [isTwoPairs])
+      cancelled = true;
+      timeouts.forEach(clearTimeout);
+    };
+  }, [isTwentyPairs]);
 
   const activePairLoad = pairLoadState[activePairIdx] ?? { loading: false, progress: 100 }
   const labelsLoading = activePairLoad.loading
@@ -539,8 +591,16 @@ export default function AnalysisScreen({ onNavigate, previousScreen, lrfFlowActi
 
   const handleExport = () => {
     setExporting(true)
-    const reportFile = bulkMode ? '/ProofX_Bulk_Report.pdf' : '/ProofX_Report.pdf'
-    const fileName = bulkMode ? 'ProofX_Bulk_Report.pdf' : 'ProofX_Report.pdf'
+    const reportFile = (bulkMode && lrfFlowActive)
+      ? '/ProofX_Bulk_LRF_Report.pdf'
+      : bulkMode
+      ? '/ProofX_Bulk_Report.pdf'
+      : '/ProofX_Report.pdf'
+    const fileName = (bulkMode && lrfFlowActive)
+      ? 'ProofX_Bulk_LRF_Report.pdf'
+      : bulkMode
+      ? 'ProofX_Bulk_Report.pdf'
+      : 'ProofX_Report.pdf'
     const a = document.createElement('a')
     a.href = reportFile
     a.download = fileName
@@ -549,6 +609,10 @@ export default function AnalysisScreen({ onNavigate, previousScreen, lrfFlowActi
     document.body.removeChild(a)
     setTimeout(() => setExporting(false), 1500)
   }
+
+  const totalCount = hasSidebar ? bulkPairs.length : 1;
+  const analysedCount = Object.values(pairLoadState).filter(s => !s.loading && s.progress === 100).length;
+  const analysedPercent = Math.round((analysedCount / totalCount) * 100);
 
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-[#F8F9FA]">
@@ -597,16 +661,13 @@ export default function AnalysisScreen({ onNavigate, previousScreen, lrfFlowActi
       {/* Main content grid - docked side-by-side with no gap/padding */}
       <div className="flex flex-1 overflow-hidden min-h-0 min-w-0">
         {/* Left LABEL PAIRS sidebar */}
-        {isTwoPairs && (
+        {hasSidebar && (
           <aside className="w-[200px] border-r border-[#E0E0E0] bg-white flex flex-col flex-shrink-0">
             <div className="px-4 py-3 border-b border-[#E0E0E0] text-xs uppercase tracking-wide text-[#5F6368]">
               Label pairs
             </div>
             <div className="flex-1 overflow-y-auto">
-              {[
-                { idx: 1, master: 'Master.pdf', revised: 'Revised.pdf', count: newFindingsList.length },
-                { idx: 2, master: 'additional changes master.pdf', revised: 'additional changes revised.pdf', count: findings.length },
-              ].map(pair => {
+              {bulkPairs.map(pair => {
                 const isActive = activePairIdx === pair.idx
                 const state = pairLoadState[pair.idx] ?? { loading: false, progress: 100 }
                 const pairLoading = state.loading
@@ -857,10 +918,29 @@ export default function AnalysisScreen({ onNavigate, previousScreen, lrfFlowActi
       >
         <div className="flex items-center gap-2 font-normal text-[#5F6368]">
           <span className="h-1.5 w-1.5 rounded-full bg-[#1C2E59]" />
-          <span>
-            {labelsLoading
-              ? 'Loading labels…'
-              : isTwoPairs ? `Pair ${activePairIdx} of 2` : 'Analysis complete'}
+          <span className="flex items-center gap-3">
+            <span>
+              {labelsLoading
+                ? 'Loading labels…'
+                : isTwentyPairs
+                ? `Pair ${activePairIdx} of 20`
+                : isTwoPairs
+                ? `Pair ${activePairIdx} of 2`
+                : 'Analysis complete'}
+            </span>
+            {hasSidebar && (
+              <div className="flex items-center gap-2.5 pl-3 border-l border-gray-200">
+                <span className="font-semibold text-slate-500">
+                  Analysed: {analysedCount} / {totalCount} labels ({analysedPercent}% complete)
+                </span>
+                <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden shrink-0">
+                  <div
+                    className="h-full bg-[#1C2E59] rounded-full transition-all duration-300 ease-out"
+                    style={{ width: `${analysedPercent}%` }}
+                  />
+                </div>
+              </div>
+            )}
           </span>
         </div>
 

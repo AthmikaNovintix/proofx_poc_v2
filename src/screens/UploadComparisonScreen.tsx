@@ -111,9 +111,20 @@ export default function UploadComparisonScreen({ onNavigate, onSetFiles }: Props
 
   const handleRunComparison = () => {
     if (!ready) return;
-    if (mode === "bulk" && bulkMismatch) {
-      setShowMismatchDialog(true);
-      return;
+    if (mode === "bulk") {
+      const repMasters: any[] = [];
+      const repRevised: any[] = [];
+      const masterSrc = { name: 'Master.pdf', size: 486400, url: '#', file: new File([], 'Master.pdf') };
+      const revisedSrc = { name: 'Revised.pdf', size: 478412, url: '#', file: new File([], 'Revised.pdf') };
+      const addMasterSrc = { name: 'additional changes master.pdf', size: 486400, url: '#', file: new File([], 'master.pdf') };
+      const addRevisedSrc = { name: 'additional changes revised.pdf', size: 478412, url: '#', file: new File([], 'revised.pdf') };
+      for (let i = 0; i < 20; i++) {
+        const isEven = i % 2 === 0;
+        repMasters.push(isEven ? { ...masterSrc } : { ...addMasterSrc });
+        repRevised.push(isEven ? { ...revisedSrc } : { ...addRevisedSrc });
+      }
+      setBulkMasters(repMasters);
+      setBulkRevised(repRevised);
     }
     setModalPhase({ type: 'preprocessing', pairIndex: 1, step: 0 });
   };
@@ -142,14 +153,19 @@ export default function UploadComparisonScreen({ onNavigate, onSetFiles }: Props
         setRevised({ name: 'Revised.pdf', size: 478412, url: '#', file: new File([], 'Revised.pdf') });
       }
     } else {
-      setBulkMasters([
-        { name: 'Label_A_Master.pdf', size: 312000, url: '#', file: new File([], 'Label_A_Master.pdf') },
-        { name: 'Label_B_Master.pdf', size: 284000, url: '#', file: new File([], 'Label_B_Master.pdf') }
-      ]);
-      setBulkRevised([
-        { name: 'Label_A_Revised.pdf', size: 309000, url: '#', file: new File([], 'Label_A_Revised.pdf') },
-        { name: 'Label_B_Revised.pdf', size: 282000, url: '#', file: new File([], 'Label_B_Revised.pdf') }
-      ]);
+      const masterSrc = { name: 'Master.pdf', size: 486400, url: '#', file: new File([], 'Master.pdf') };
+      const revisedSrc = { name: 'Revised.pdf', size: 478412, url: '#', file: new File([], 'Revised.pdf') };
+      const addMasterSrc = { name: 'additional changes master.pdf', size: 486400, url: '#', file: new File([], 'master.pdf') };
+      const addRevisedSrc = { name: 'additional changes revised.pdf', size: 478412, url: '#', file: new File([], 'revised.pdf') };
+      const rMasters: any[] = [];
+      const rRevised: any[] = [];
+      for (let i = 0; i < 20; i++) {
+        const isEven = i % 2 === 0;
+        rMasters.push(isEven ? { ...masterSrc } : { ...addMasterSrc });
+        rRevised.push(isEven ? { ...revisedSrc } : { ...addRevisedSrc });
+      }
+      setBulkMasters(rMasters);
+      setBulkRevised(rRevised);
     }
   };
 
@@ -252,14 +268,23 @@ export default function UploadComparisonScreen({ onNavigate, onSetFiles }: Props
                     onClick={() => {
                       setMode(m);
                       if (m === "bulk" && bulkMasters.length === 0) {
-                        setBulkMasters([
+                        const baseM = [
                           { name: 'Master.pdf', size: 486400, url: '#', file: new File([], 'Master.pdf'), pageCount: 1 } as any,
                           { name: 'additional changes master.pdf', size: 486400, url: '#', file: new File([], 'master.pdf'), pageCount: 1 } as any,
-                        ]);
-                        setBulkRevised([
+                        ];
+                        const baseR = [
                           { name: 'Revised.pdf', size: 478412, url: '#', file: new File([], 'Revised.pdf'), pageCount: 1 } as any,
                           { name: 'additional changes revised.pdf', size: 478412, url: '#', file: new File([], 'revised.pdf'), pageCount: 1 } as any,
-                        ]);
+                        ];
+                        const rMasters: any[] = [];
+                        const rRevised: any[] = [];
+                        for (let i = 0; i < 20; i++) {
+                          const isEven = i % 2 === 0;
+                          rMasters.push(isEven ? { ...baseM[0] } : { ...baseM[1] });
+                          rRevised.push(isEven ? { ...baseR[0] } : { ...baseR[1] });
+                        }
+                        setBulkMasters(rMasters);
+                        setBulkRevised(rRevised);
                       }
                       if (m === "single" && !master) {
                         setMaster({ name: 'Master.pdf', size: 486400, url: '#', file: new File([], 'Master.pdf') });
@@ -608,9 +633,12 @@ function ProcessingModal({
               <ScanLine className="h-4 w-4 text-[#1C2E59] animate-spin" style={{ animationDuration: "2.2s" }} />
               <span className="text-xs font-bold tracking-tight uppercase text-[#1C2E59]">ProofX</span>
             </div>
-            <div className="text-lg font-semibold text-[#1A1A2E]">
+            <div className="text-lg font-semibold text-[#1A1A2E] mb-2">
               {title}
             </div>
+            <p className="text-[11px] text-[#253e7a] leading-relaxed bg-[#f0f4f8] border border-blue-100 p-2.5 rounded-lg">
+              <strong>Why preprocessing?</strong> We align pages and calibrate image resolution so that differences are detected with pixel-level accuracy.
+            </p>
           </div>
 
           <div className="flex flex-col gap-5">

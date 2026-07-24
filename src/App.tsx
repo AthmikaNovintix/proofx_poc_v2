@@ -41,6 +41,7 @@ export default function App() {
   // LRF states
   const [lrfFlowActive, setLrfFlowActive] = useState(false)
   const [bulkMode, setBulkMode] = useState(false)
+  const [historyPreview, setHistoryPreview] = useState(false)
   const [masterFilename, setMasterFilename] = useState('Master.pdf')
   const [revisedFilename, setRevisedFilename] = useState('Revised.pdf')
   const [lrfData, setLrfData] = useState<{ crNumber: string; date: string; revFrom: string; revTo: string; count: number; list: any[] }>({
@@ -104,7 +105,7 @@ export default function App() {
       return <LoginScreen onNavigate={navigate} />
 
     case 'proofreader-history':
-      return <ProofreaderHistoryScreen onNavigate={navigate} previousScreen={previousScreen} onSetFiles={(m, r, bulk) => { setMasterFilename(m); setRevisedFilename(r); setBulkMode(!!bulk) }} onSetLrfFlowActive={setLrfFlowActive} />
+      return <ProofreaderHistoryScreen onNavigate={navigate} previousScreen={previousScreen} onSetFiles={(m, r, bulk) => { setMasterFilename(m); setRevisedFilename(r); setBulkMode(!!bulk); setHistoryPreview(!!bulk); }} onSetLrfFlowActive={setLrfFlowActive} />
 
     case 'forgot-password':
       return <ForgotPasswordScreen onNavigate={navigate} />
@@ -113,10 +114,10 @@ export default function App() {
       return <PasswordResetScreen onNavigate={navigate} />
 
     case 'proofreader-dashboard':
-      return <ProofreaderDashboardScreen onNavigate={navigate} onSetLrfFlowActive={setLrfFlowActive} onSetFiles={(m, r, bulk) => { setMasterFilename(m); setRevisedFilename(r); setBulkMode(!!bulk) }} />
+      return <ProofreaderDashboardScreen onNavigate={navigate} onSetLrfFlowActive={setLrfFlowActive} onSetFiles={(m, r, bulk) => { setMasterFilename(m); setRevisedFilename(r); setBulkMode(!!bulk); setHistoryPreview(!!bulk); }} />
 
     case 'upload-comparison':
-      return <UploadComparisonScreen onNavigate={navigate} onSetFiles={(m, r, bulk) => { setMasterFilename(m); setRevisedFilename(r); setBulkMode(!!bulk); }} />
+      return <UploadComparisonScreen onNavigate={navigate} onSetFiles={(m, r, bulk) => { setMasterFilename(m); setRevisedFilename(r); setBulkMode(!!bulk); setHistoryPreview(false); }} />
 
     case 'analysis':
       return (
@@ -127,14 +128,15 @@ export default function App() {
           bulkMode={bulkMode}
           masterFilename={masterFilename}
           revisedFilename={revisedFilename}
+          historyPreview={historyPreview}
         />
       )
 
     case 'admin-dashboard':
-      return <AdminDashboardScreen onNavigate={navigate} onSelectProofreader={setSelectedProofreader} onSetFiles={(m, r, bulk) => { setMasterFilename(m); setRevisedFilename(r); setBulkMode(!!bulk) }} onSetLrfFlowActive={setLrfFlowActive} />
+      return <AdminDashboardScreen onNavigate={navigate} onSelectProofreader={setSelectedProofreader} onSetFiles={(m, r, bulk) => { setMasterFilename(m); setRevisedFilename(r); setBulkMode(!!bulk); setHistoryPreview(!!bulk); }} onSetLrfFlowActive={setLrfFlowActive} />
 
     case 'workspace-admin-dashboard':
-      return <WorkspaceAdminDashboardScreen onNavigate={navigate} onSelectProofreader={setSelectedProofreader} onSetFiles={(m, r, bulk) => { setMasterFilename(m); setRevisedFilename(r); setBulkMode(!!bulk) }} onSetLrfFlowActive={setLrfFlowActive} />
+      return <WorkspaceAdminDashboardScreen onNavigate={navigate} onSelectProofreader={setSelectedProofreader} onSetFiles={(m, r, bulk) => { setMasterFilename(m); setRevisedFilename(r); setBulkMode(!!bulk); setHistoryPreview(!!bulk); }} onSetLrfFlowActive={setLrfFlowActive} />
 
     case 'team-members':
       return <TeamMembersScreen onNavigate={navigate} onSelectProofreader={setSelectedProofreader} userRole={userRole} />
@@ -147,7 +149,7 @@ export default function App() {
           selectedProofreader={selectedProofreader}
           onSelectProofreader={setSelectedProofreader}
           userRole={userRole}
-          onSetFiles={(m, r, bulk) => { setMasterFilename(m); setRevisedFilename(r); setBulkMode(!!bulk) }}
+          onSetFiles={(m, r, bulk) => { setMasterFilename(m); setRevisedFilename(r); setBulkMode(!!bulk); setHistoryPreview(!!bulk); }}
           onSetLrfFlowActive={setLrfFlowActive}
         />
       )
@@ -159,7 +161,7 @@ export default function App() {
       return <ChangeRequestFormScreen onNavigate={navigate} onSaveLrf={setLrfData} />
 
     case 'upload-lrf':
-      return <UploadLrfScreen onNavigate={navigate} lrfData={lrfData} onSetLrfFlowActive={setLrfFlowActive} onSetFiles={(m, r, bulk) => { setMasterFilename(m); setRevisedFilename(r); setBulkMode(!!bulk); }} />
+      return <UploadLrfScreen onNavigate={navigate} lrfData={lrfData} onSetLrfFlowActive={setLrfFlowActive} onSetFiles={(m, r, bulk) => { setMasterFilename(m); setRevisedFilename(r); setBulkMode(!!bulk); setHistoryPreview(false); }} />
 
     default:
       return <LoginScreen onNavigate={navigate} />
