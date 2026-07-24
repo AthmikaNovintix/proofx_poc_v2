@@ -35,8 +35,8 @@ const findings: Finding[] = [
     masterHad: 'EC Rep',
     revisedHas: 'EU Rep',
     classification: 'Expected',
-    master: { x: 105, y: 380, w: 120, h: 15 },
-    revised: { x: 105, y: 380, w: 120, h: 15 }
+    master: { x: 272, y: 92, w: 238, h: 132 },
+    revised: { x: 272, y: 92, w: 238, h: 132 }
   },
   {
     id: 'T1',
@@ -45,8 +45,8 @@ const findings: Finding[] = [
     masterHad: '2026-01-22 MedosInternational SARL Chemin-Blanc38 2400 Le Locle, Switzerland',
     revisedHas: '2026-01-22 1302 Wrights Lane East, West Westchester, PA 19380, USA (Craniomaxillofacial)',
     classification: 'Expected',
-    master: { x: 200, y: 420, w: 160, h: 26 },
-    revised: { x: 200, y: 420, w: 160, h: 26 }
+    master: { x: 55, y: 250, w: 402, h: 145 },
+    revised: { x: 55, y: 250, w: 402, h: 145 }
   },
   {
     id: 'T2',
@@ -55,8 +55,8 @@ const findings: Finding[] = [
     masterHad: 'DePuySynthes',
     revisedHas: 'DePuy Synthes',
     classification: 'Expected',
-    master: { x: 242, y: 218, w: 62, h: 15 },
-    revised: { x: 242, y: 218, w: 62, h: 15 }
+    master: { x: 240, y: 118, w: 92, h: 18 },
+    revised: { x: 240, y: 118, w: 92, h: 18 }
   },
   {
     id: 'T3',
@@ -65,8 +65,8 @@ const findings: Finding[] = [
     masterHad: 'REV.A',
     revisedHas: 'REV.B',
     classification: 'Unexpected',
-    master: { x: 366, y: 480, w: 28, h: 14 },
-    revised: { x: 366, y: 480, w: 28, h: 14 }
+    master: { x: 353, y: 478, w: 60, h: 18 },
+    revised: { x: 353, y: 478, w: 60, h: 18 }
   },
   {
     id: 'T4',
@@ -75,8 +75,8 @@ const findings: Finding[] = [
     masterHad: 'www.e-ifu.com',
     revisedHas: 'www.e-depuysynthes-ifu.com',
     classification: 'Expected',
-    master: { x: 105, y: 315, w: 148, h: 15 },
-    revised: { x: 105, y: 315, w: 148, h: 15 }
+    master: { x: 68, y: 310, w: 188, h: 16 },
+    revised: { x: 68, y: 310, w: 188, h: 16 }
   },
   {
     id: 'T5',
@@ -85,8 +85,8 @@ const findings: Finding[] = [
     masterHad: '2026-01-22 MedosInternational SARL Chemin-Blanc38 2400 Le Locle, Switzerland',
     revisedHas: '2026-01-22 1302 Wrights Lane East, West Westchester, PA 19380, USA (Craniomaxillofacial)',
     classification: 'Expected',
-    master: { x: 200, y: 420, w: 160, h: 26 },
-    revised: { x: 200, y: 420, w: 160, h: 26 }
+    master: { x: 55, y: 250, w: 402, h: 145 },
+    revised: { x: 55, y: 250, w: 402, h: 145 }
   },
   {
     id: 'T6',
@@ -95,8 +95,8 @@ const findings: Finding[] = [
     masterHad: 'Belguim',
     revisedHas: 'USA',
     classification: 'Unexpected',
-    master: { x: 150, y: 500, w: 70, h: 14 },
-    revised: { x: 150, y: 500, w: 70, h: 14 }
+    master: { x: 148, y: 498, w: 74, h: 16 },
+    revised: { x: 148, y: 498, w: 74, h: 16 }
   },
   {
     id: 'T7',
@@ -105,8 +105,8 @@ const findings: Finding[] = [
     masterHad: 'REV.A',
     revisedHas: 'REV.B',
     classification: 'Unexpected',
-    master: { x: 366, y: 480, w: 28, h: 14 },
-    revised: { x: 366, y: 480, w: 28, h: 14 }
+    master: { x: 353, y: 478, w: 60, h: 18 },
+    revised: { x: 353, y: 478, w: 60, h: 18 }
   }
 ]
 
@@ -119,8 +119,8 @@ const newFindingsList: Finding[] = [
     masterHad: '2026-01-22 MedosInternational SARL Chemin-Blanc38 2400 Le Locle, Switzerland',
     revisedHas: '2020-01-22 1302WrightsLaneEast, WestChester,PA19380, USACraniomaxillofacial',
     classification: 'Expected',
-    master: { x: 200, y: 460, w: 42, h: 26 },
-    revised: { x: 200, y: 460, w: 42, h: 26 }
+    master: { x: 55, y: 250, w: 402, h: 145 },
+    revised: { x: 55, y: 250, w: 402, h: 145 }
   },
   {
     id: 'T2',
@@ -129,8 +129,8 @@ const newFindingsList: Finding[] = [
     masterHad: 'DePuySynthes',
     revisedHas: 'DePuy Synthes',
     classification: 'Expected',
-    master: { x: 242, y: 218, w: 62, h: 15 },
-    revised: { x: 242, y: 218, w: 62, h: 15 }
+    master: { x: 240, y: 118, w: 92, h: 18 },
+    revised: { x: 240, y: 118, w: 92, h: 18 }
   },
   {
     id: 'T3',
@@ -139,8 +139,8 @@ const newFindingsList: Finding[] = [
     masterHad: '//www.e-ifu.com/symbols-glossary',
     revisedHas: '//www.e-depuysynthes-ifu.com/symbols-glossary',
     classification: 'Expected',
-    master: { x: 105, y: 315, w: 148, h: 15 },
-    revised: { x: 105, y: 315, w: 148, h: 15 }
+    master: { x: 68, y: 310, w: 188, h: 16 },
+    revised: { x: 68, y: 310, w: 188, h: 16 }
   },
   {
     id: 'T4',
@@ -149,8 +149,8 @@ const newFindingsList: Finding[] = [
     masterHad: 'MedosInternationalSARL Chemin-Blanc38 2400LeLocle,Switzerland',
     revisedHas: '1302Wrights Lane East, WestChester,PA19380, USA(Craniomaxillofacial)',
     classification: 'Expected',
-    master: { x: 200, y: 460, w: 42, h: 26 },
-    revised: { x: 200, y: 460, w: 42, h: 26 }
+    master: { x: 55, y: 250, w: 402, h: 145 },
+    revised: { x: 55, y: 250, w: 402, h: 145 }
   },
   {
     id: 'G1',
@@ -159,8 +159,8 @@ const newFindingsList: Finding[] = [
     masterHad: 'EC REP',
     revisedHas: 'EU REP',
     classification: 'Expected',
-    master: { x: 300, y: 460, w: 50, h: 30 },
-    revised: { x: 300, y: 460, w: 50, h: 30 }
+    master: { x: 488, y: 183, w: 80, h: 44 },
+    revised: { x: 488, y: 183, w: 80, h: 44 }
   }
 ]
 
@@ -297,53 +297,21 @@ function LabelPanel({
             className="relative mx-auto bg-white rounded-lg shadow-sm overflow-hidden"
             style={{ width: width * scale, height: height * scale }}
           >
-            {/* Render real PDF file in iframe with view=Fit to auto-scale the page layout */}
-            <div style={{ width: '100%', height: '100%', overflow: 'hidden' }}>
-              <iframe
-                src={`${fileUrl}#page=1&view=FitH&toolbar=0&navpanes=0&scrollbar=0`}
-                scrolling="no"
-                style={{
-                  width: 'calc(100% + 28px)',
-                  height: 'calc(100% + 32px)',
-                  marginLeft: '-8px',
-                  marginTop: '-8px',
-                  border: "none",
-                  outline: "none",
-                  display: "block",
-                  pointerEvents: "none",
-                  userSelect: "none",
-                  overflow: "hidden",
-                }}
-                title={title}
-              />
-            </div>
+            {/* Render label image */}
+            <img
+              src={fileUrl}
+              alt={title}
+              draggable={false}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'fill',
+                display: 'block',
+                pointerEvents: 'none',
+                userSelect: 'none',
+              }}
+            />
 
-            {/* Overlays */}
-            {findings.map(f => {
-              const bb = variant === 'master' ? f.master : f.revised
-              const isSelected = expandedIdMatch(selectedFinding, f.id)
-              const color = typeColors[f.type].color
-              return (
-                <div
-                  key={f.id}
-                  className={isSelected ? "bbox-pulse" : ""}
-                  style={{
-                    position: 'absolute',
-                    left: bb.x * scale,
-                    top: bb.y * scale,
-                    width: bb.w * scale,
-                    height: bb.h * scale,
-                    border: `2px solid ${color}`,
-                    backgroundColor: isSelected ? `${color}22` : `${color}08`,
-                    boxSizing: 'border-box',
-                    pointerEvents: 'none',
-                    boxShadow: isSelected ? '0 0 0 9999px rgba(15, 23, 42, 0.45)' : 'none',
-                    zIndex: isSelected ? 20 : 1,
-                    transition: 'box-shadow 0.15s ease-in-out',
-                  }}
-                />
-              )
-            })}
           </div>
         </div>
       )}
@@ -405,8 +373,8 @@ export default function AnalysisScreen({ onNavigate, previousScreen, lrfFlowActi
   const activeFindingsList = isMasterPdf ? findings : newFindingsList;
   const activeMasterName = isTwoPairs ? (isMasterPdf ? 'additional changes master.pdf' : 'Master.pdf') : masterFilename;
   const activeRevisedName = isTwoPairs ? (isMasterPdf ? 'additional changes revised.pdf' : 'Revised.pdf') : revisedFilename;
-  const masterPdfPath = isMasterPdf ? '/additional changes master.pdf' : '/Master.pdf';
-  const revisedPdfPath = isMasterPdf ? '/additional changes revised.pdf' : '/Revised.pdf';
+  const masterPdfPath = isMasterPdf ? '/labels/additional changes master.png' : '/labels/Master.png';
+  const revisedPdfPath = isMasterPdf ? '/labels/additional changes revised.png' : '/labels/Revised.png';
 
   // Every label pair starts loading at the same time (no click needed); each pair
   // tracks its own progress and stays disabled until its own load completes.

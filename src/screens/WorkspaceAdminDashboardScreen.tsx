@@ -3,7 +3,7 @@ import NavBar from '../components/NavBar'
 import { C } from '../colors'
 import type { Screen } from '../App'
 
-type Props = { onNavigate: (s: Screen) => void; onSelectProofreader: (name: string | null) => void }
+type Props = { onNavigate: (s: Screen) => void; onSelectProofreader: (name: string | null) => void; onSetFiles?: (master: string, revised: string, bulk: boolean) => void; onSetLrfFlowActive?: (active: boolean) => void }
 
 const flashCards = [
   {
@@ -83,7 +83,7 @@ function Badge({ children, bg, color }: { children: ReactNode; bg: string; color
   )
 }
 
-export default function WorkspaceAdminDashboardScreen({ onNavigate, onSelectProofreader }: Props) {
+export default function WorkspaceAdminDashboardScreen({ onNavigate, onSelectProofreader, onSetFiles, onSetLrfFlowActive }: Props) {
   const [searchQuery, setSearchQuery] = useState('')
   const [workflowFilter, setWorkflowFilter] = useState<'ALL' | 'VISUAL COMPARISON' | 'PROOF READING'>('ALL')
   const [hoveredDataPoint, setHoveredDataPoint] = useState<number | null>(null)
@@ -264,7 +264,7 @@ export default function WorkspaceAdminDashboardScreen({ onNavigate, onSelectProo
                   className="text-xs font-semibold hover:opacity-80 transition-all cursor-pointer"
                   style={{ color: C.orange }}
                   onClick={() => {
-                    const headers = ['Date / Time', 'Proofreader', 'Master', 'Revised', 'Mode', 'Pairs', 'Findings', 'Workflow', 'Status']
+                    const headers = ['Date / Time', 'Proofreader', 'Master', 'Revised', 'Mode', 'Pairs', 'Findings', 'Workflow', 'Run status']
                     const csvRows = filteredRows.map(r =>
                       [r.datetime, r.proofreader, r.master, r.revised, r.mode, r.pairs, r.findings, r.workflow, r.status]
                         .map(v => `"${v}"`).join(',')
@@ -326,11 +326,23 @@ export default function WorkspaceAdminDashboardScreen({ onNavigate, onSelectProo
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm table-fixed" style={{ minWidth: 860 }}>
+              <colgroup>
+                <col style={{ width: '14%' }} />{/* DATE / TIME */}
+                <col style={{ width: '9%' }} /> {/* PROOFREADER */}
+                <col style={{ width: '10%' }} />{/* MASTER FILE */}
+                <col style={{ width: '10%' }} />{/* REVISED FILE */}
+                <col style={{ width: '6%' }} /> {/* MODE */}
+                <col style={{ width: '5%' }} /> {/* PAIRS */}
+                <col style={{ width: '6%' }} /> {/* FINDINGS */}
+                <col style={{ width: '15%' }} />{/* WORKFLOW */}
+                <col style={{ width: '9%' }} /> {/* RUN STATUS */}
+                <col style={{ width: '10%' }} />{/* ACTIONS */}
+              </colgroup>
               <thead>
                 <tr style={{ backgroundColor: C.grayBg, borderBottom: `1px solid ${C.border}` }}>
-                  {['DATE / TIME', 'PROOFREADER', 'MASTER FILE', 'REVISED FILE', 'MODE', 'PAIRS', 'FINDINGS', 'WORKFLOW', 'STATUS', 'ACTIONS'].map(h => (
-                    <th key={h} className="px-3 py-2.5 text-left text-xs font-bold text-slate-400 tracking-wider whitespace-nowrap">{h}</th>
+                  {['DATE / TIME', 'PROOFREADER', 'MASTER FILE', 'REVISED FILE', 'MODE', 'PAIRS', 'FINDINGS', 'WORKFLOW', 'RUN STATUS', 'ACTIONS'].map(h => (
+                    <th key={h} className="px-2 py-2.5 text-left text-xs font-bold text-slate-400 tracking-wider">{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -346,8 +358,8 @@ export default function WorkspaceAdminDashboardScreen({ onNavigate, onSelectProo
                         className="hover:bg-slate-50 transition-colors"
                         style={{ borderBottom: i < filteredRows.length - 1 ? `1px solid ${C.border}` : 'none' }}
                       >
-                        <td className="px-3 py-3 text-xs whitespace-nowrap text-slate-400">{row.datetime}</td>
-                        <td className="px-3 py-3 font-semibold text-xs text-slate-700">
+                        <td className="px-2 py-3 text-xs text-slate-400 truncate" title={row.datetime}>{row.datetime}</td>
+                        <td className="px-2 py-3 font-semibold text-xs text-slate-700">
                           <button
                             onClick={() => { onSelectProofreader(row.proofreader); onNavigate('admin-history') }}
                             className="hover:underline text-slate-700 font-semibold cursor-pointer text-left"
@@ -356,7 +368,8 @@ export default function WorkspaceAdminDashboardScreen({ onNavigate, onSelectProo
                           </button>
                         </td>
                         <td
-                          className={`px-3 py-3 text-xs text-slate-600 truncate max-w-[140px] ${row.mode === 'BULK' ? 'cursor-pointer hover:underline font-semibold' : ''}`}
+                          className={`px-2 py-3 text-xs text-slate-600 truncate ${row.mode === 'BULK' ? 'cursor-pointer hover:underline font-semibold' : ''}`}
+                          title={row.master}
                           onClick={() => { if (row.mode === 'BULK') setExpandedRows(prev => ({ ...prev, [i]: !prev[i] })) }}
                         >
                           {row.mode === 'BULK' ? (
@@ -367,7 +380,8 @@ export default function WorkspaceAdminDashboardScreen({ onNavigate, onSelectProo
                           ) : row.master}
                         </td>
                         <td
-                          className={`px-3 py-3 text-xs text-slate-600 truncate max-w-[140px] ${row.mode === 'BULK' ? 'cursor-pointer hover:underline font-semibold' : ''}`}
+                          className={`px-2 py-3 text-xs text-slate-600 truncate ${row.mode === 'BULK' ? 'cursor-pointer hover:underline font-semibold' : ''}`}
+                          title={row.revised}
                           onClick={() => { if (row.mode === 'BULK') setExpandedRows(prev => ({ ...prev, [i]: !prev[i] })) }}
                         >
                           {row.mode === 'BULK' ? (
@@ -377,23 +391,28 @@ export default function WorkspaceAdminDashboardScreen({ onNavigate, onSelectProo
                             </span>
                           ) : row.revised}
                         </td>
-                        <td className="px-3 py-3">
+                        <td className="px-2 py-3">
                           <Badge bg={row.mode === 'BULK' ? C.navyLight : C.grayBg} color={row.mode === 'BULK' ? C.navy : C.grayText}>{row.mode}</Badge>
                         </td>
-                        <td className="px-3 py-3 text-xs text-center text-slate-700">{row.pairs}</td>
-                        <td className="px-3 py-3 text-xs text-center font-bold text-slate-800">{row.findings}</td>
-                        <td className="px-3 py-3">
+                        <td className="px-2 py-3 text-xs text-center text-slate-700">{row.pairs}</td>
+                        <td className="px-2 py-3 text-xs text-center font-bold text-slate-800">{row.findings}</td>
+                        <td className="px-2 py-3">
                           <Badge bg={row.workflow === 'VISUAL COMPARISON' ? C.orangeLight : C.navyLight} color={row.workflow === 'VISUAL COMPARISON' ? C.orangeText : C.navy}>
                             {row.workflow}
                           </Badge>
                         </td>
-                        <td className="px-3 py-3">
+                        <td className="px-2 py-3">
                           <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-100">{row.status}</span>
                         </td>
-                        <td className="px-3 py-3">
+                        <td className="px-2 py-3">
                           <div className="flex items-center gap-1.5">
                             <button
-                              onClick={() => onNavigate('analysis')}
+                              onClick={() => {
+                                const isBulk = row.mode === 'BULK'
+                                onSetFiles?.(isBulk ? 'Master.pdf' : row.master, isBulk ? 'Revised.pdf' : row.revised, isBulk)
+                                onSetLrfFlowActive?.(row.workflow === 'PROOF READING')
+                                onNavigate('analysis')
+                              }}
                               className="flex items-center justify-center rounded-lg hover:bg-slate-200 transition-colors cursor-pointer"
                               style={{ width: 26, height: 26, backgroundColor: C.grayBg }}
                               title="Preview analysis"

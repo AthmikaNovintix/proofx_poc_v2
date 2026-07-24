@@ -9,6 +9,8 @@ type Props = {
   selectedProofreader?: string | null
   onSelectProofreader?: (name: string | null) => void
   userRole?: 'admin' | 'workspace-admin' | 'proofreader'
+  onSetFiles?: (master: string, revised: string, bulk: boolean) => void
+  onSetLrfFlowActive?: (active: boolean) => void
 }
 
 const teamMap: Record<string, { name: string; color: string; lightColor: string }> = {
@@ -46,6 +48,8 @@ export default function AdminHistoryScreen({
   selectedProofreader,
   onSelectProofreader,
   userRole,
+  onSetFiles,
+  onSetLrfFlowActive,
 }: Props) {
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set())
   const [page, setPage] = useState(1)
@@ -94,7 +98,7 @@ export default function AdminHistoryScreen({
             className="text-xs ml-4 font-medium hover:opacity-80 transition-all cursor-pointer"
             style={{ color: 'rgba(255,255,255,0.6)' }}
             onClick={() => {
-              const headers = ['Date / Time', 'Proofreader', 'Master', 'Revised', 'Mode', 'Pairs', 'Skipped', 'Findings', 'Workflow', 'Status']
+              const headers = ['Date / Time', 'Proofreader', 'Master', 'Revised', 'Mode', 'Pairs', 'Skipped', 'Findings', 'Workflow', 'Run status']
               const csvRows = filteredRows.map(r =>
                 [r.datetime, r.proofreader, r.master, r.revised, r.mode, r.pairs, r.skipped, r.findings, r.workflow, r.status]
                   .map(v => `"${v}"`).join(',')
@@ -147,7 +151,7 @@ export default function AdminHistoryScreen({
           <table className="w-full text-sm">
             <thead>
               <tr style={{ backgroundColor: C.grayBg, borderBottom: `1px solid ${C.border}` }}>
-                {['', 'DATE / TIME', 'PROOFREADER', ...(!isWorkspaceAdmin ? ['TEAM'] : []), 'MASTER', 'REVISED', 'MODE', 'PAIRS', 'SKIPPED', 'FINDINGS', 'WORKFLOW', 'STATUS', 'PREVIEW', 'DOWNLOAD'].map(h => (
+                {['', 'DATE / TIME', 'PROOFREADER', ...(!isWorkspaceAdmin ? ['TEAM'] : []), 'MASTER', 'REVISED', 'MODE', 'PAIRS', 'SKIPPED', 'FINDINGS', 'WORKFLOW', 'RUN STATUS', 'PREVIEW', 'DOWNLOAD'].map(h => (
                   <th key={h} className="px-3 py-2.5 text-left text-xs font-bold text-slate-400 tracking-wider whitespace-nowrap">
                     {h}
                   </th>
@@ -233,7 +237,12 @@ export default function AdminHistoryScreen({
                       </td>
                       <td className="px-3 py-3">
                         <button
-                          onClick={() => onNavigate('analysis')}
+                          onClick={() => {
+                            const isBulk = row.mode === 'BULK'
+                            onSetFiles?.(isBulk ? 'Master.pdf' : row.master, isBulk ? 'Revised.pdf' : row.revised, isBulk)
+                            onSetLrfFlowActive?.(row.workflow === 'PROOF READING')
+                            onNavigate('analysis')
+                          }}
                           className="flex items-center justify-center rounded hover:opacity-70 cursor-pointer"
                           style={{ width: 28, height: 28, backgroundColor: C.grayBg }}
                         >

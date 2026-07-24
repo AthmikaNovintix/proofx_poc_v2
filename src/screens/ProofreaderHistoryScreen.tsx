@@ -6,6 +6,8 @@ import type { Screen } from '../App'
 type Props = {
   onNavigate: (s: Screen) => void
   previousScreen?: Screen
+  onSetFiles?: (master: string, revised: string, bulk: boolean) => void
+  onSetLrfFlowActive?: (active: boolean) => void
 }
 
 const rows = [
@@ -23,7 +25,7 @@ const bulkFiles = [
   { name: 'secondary label master.pdf', size: '312.4 KB' },
 ]
 
-export default function ProofreaderHistoryScreen({ onNavigate, previousScreen }: Props) {
+export default function ProofreaderHistoryScreen({ onNavigate, previousScreen, onSetFiles, onSetLrfFlowActive }: Props) {
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set())
   const [workflowFilter, setWorkflowFilter] = useState<'ALL' | 'VISUAL COMPARISON' | 'PROOF READING'>('ALL')
   const [searchQuery, setSearchQuery] = useState('')
@@ -188,7 +190,12 @@ export default function ProofreaderHistoryScreen({ onNavigate, previousScreen }:
                       </td>
                       <td className="px-3 py-3">
                         <button
-                          onClick={() => onNavigate('analysis')}
+                          onClick={() => {
+                            const isBulk = row.mode === 'BULK'
+                            onSetFiles?.(isBulk ? 'Master.pdf' : row.master, isBulk ? 'Revised.pdf' : row.revised, isBulk)
+                            onSetLrfFlowActive?.(row.workflow === 'PROOF READING')
+                            onNavigate('analysis')
+                          }}
                           className="flex items-center justify-center rounded hover:opacity-70 cursor-pointer"
                           style={{ width: 28, height: 28, backgroundColor: C.grayBg }}
                         >

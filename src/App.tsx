@@ -104,7 +104,7 @@ export default function App() {
       return <LoginScreen onNavigate={navigate} />
 
     case 'proofreader-history':
-      return <ProofreaderHistoryScreen onNavigate={navigate} previousScreen={previousScreen} />
+      return <ProofreaderHistoryScreen onNavigate={navigate} previousScreen={previousScreen} onSetFiles={(m, r, bulk) => { setMasterFilename(m); setRevisedFilename(r); setBulkMode(!!bulk) }} onSetLrfFlowActive={setLrfFlowActive} />
 
     case 'forgot-password':
       return <ForgotPasswordScreen onNavigate={navigate} />
@@ -113,7 +113,7 @@ export default function App() {
       return <PasswordResetScreen onNavigate={navigate} />
 
     case 'proofreader-dashboard':
-      return <ProofreaderDashboardScreen onNavigate={navigate} onSetLrfFlowActive={setLrfFlowActive} />
+      return <ProofreaderDashboardScreen onNavigate={navigate} onSetLrfFlowActive={setLrfFlowActive} onSetFiles={(m, r, bulk) => { setMasterFilename(m); setRevisedFilename(r); setBulkMode(!!bulk) }} />
 
     case 'upload-comparison':
       return <UploadComparisonScreen onNavigate={navigate} onSetFiles={(m, r, bulk) => { setMasterFilename(m); setRevisedFilename(r); setBulkMode(!!bulk); }} />
@@ -131,10 +131,10 @@ export default function App() {
       )
 
     case 'admin-dashboard':
-      return <AdminDashboardScreen onNavigate={navigate} onSelectProofreader={setSelectedProofreader} />
+      return <AdminDashboardScreen onNavigate={navigate} onSelectProofreader={setSelectedProofreader} onSetFiles={(m, r, bulk) => { setMasterFilename(m); setRevisedFilename(r); setBulkMode(!!bulk) }} onSetLrfFlowActive={setLrfFlowActive} />
 
     case 'workspace-admin-dashboard':
-      return <WorkspaceAdminDashboardScreen onNavigate={navigate} onSelectProofreader={setSelectedProofreader} />
+      return <WorkspaceAdminDashboardScreen onNavigate={navigate} onSelectProofreader={setSelectedProofreader} onSetFiles={(m, r, bulk) => { setMasterFilename(m); setRevisedFilename(r); setBulkMode(!!bulk) }} onSetLrfFlowActive={setLrfFlowActive} />
 
     case 'team-members':
       return <TeamMembersScreen onNavigate={navigate} onSelectProofreader={setSelectedProofreader} userRole={userRole} />
@@ -147,6 +147,8 @@ export default function App() {
           selectedProofreader={selectedProofreader}
           onSelectProofreader={setSelectedProofreader}
           userRole={userRole}
+          onSetFiles={(m, r, bulk) => { setMasterFilename(m); setRevisedFilename(r); setBulkMode(!!bulk) }}
+          onSetLrfFlowActive={setLrfFlowActive}
         />
       )
 

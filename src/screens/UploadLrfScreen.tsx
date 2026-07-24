@@ -128,7 +128,7 @@ export default function UploadLrfScreen({ lrfData, onNavigate, onSetLrfFlowActiv
     if (!modalPhase) return;
 
     if (modalPhase.type === 'preprocessing') {
-      const isTwoPairs = (master?.name === 'Master.pdf');
+      const isTwoPairs = mode === 'bulk' && master?.name === 'Master.pdf';
       if (modalPhase.step < PRE_STEPS.length - 1) {
         const t = setTimeout(() => setModalPhase({ type: 'preprocessing', pairIndex: modalPhase.pairIndex, step: modalPhase.step + 1 }), 900);
         return () => clearTimeout(t);
@@ -144,7 +144,7 @@ export default function UploadLrfScreen({ lrfData, onNavigate, onSetLrfFlowActiv
     }
 
     if (modalPhase.type === 'analysing') {
-      const isTwoPairs = (master?.name === 'Master.pdf');
+      const isTwoPairs = mode === 'bulk' && master?.name === 'Master.pdf';
       if (modalPhase.step < ANALYSIS_STEPS.length - 1) {
         const t = setTimeout(() => setModalPhase({ type: 'analysing', pairIndex: modalPhase.pairIndex, step: modalPhase.step + 1 }), 600);
         return () => clearTimeout(t);
@@ -542,6 +542,7 @@ export default function UploadLrfScreen({ lrfData, onNavigate, onSetLrfFlowActiv
           onReupload={handleReupload}
           masterName={master?.name ?? 'master.pdf'}
           revisedName={revised?.name ?? 'revised.pdf'}
+          isBulk={mode === 'bulk'}
         />
       )}
     </>
@@ -798,12 +799,14 @@ function ProcessingModal({
   onReupload,
   masterName,
   revisedName,
+  isBulk,
 }: {
   phase: ModalPhase;
   onContinue: () => void;
   onReupload: () => void;
   masterName: string;
   revisedName: string;
+  isBulk: boolean;
 }) {
   if (!phase) return null;
 
@@ -815,7 +818,7 @@ function ProcessingModal({
   const currentStep = (isPreprocessing || isAnalysing) ? (phase as { type: string; step: number }).step : -1;
   const steps = isAnalysing ? ANALYSIS_STEPS : PRE_STEPS;
 
-  const isTwoPairs = masterName === 'Master.pdf';
+  const isTwoPairs = isBulk && masterName === 'Master.pdf';
   const pairText = isTwoPairs ? '2 pairs' : '1 pair';
   const pairCount = isTwoPairs ? 2 : 1;
   const title = isAnalysing ? `Analysing ${pairText}` : `Pre-processing ${pairText}`;

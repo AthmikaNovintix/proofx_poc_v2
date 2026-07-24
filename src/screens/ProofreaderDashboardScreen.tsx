@@ -3,7 +3,7 @@ import { FileText, ClipboardList, CheckCircle2, ArrowRight } from 'lucide-react'
 import { C } from '../colors'
 import type { Screen } from '../App'
 
-type Props = { onNavigate: (s: Screen) => void; onSetLrfFlowActive: (active: boolean) => void }
+type Props = { onNavigate: (s: Screen) => void; onSetLrfFlowActive: (active: boolean) => void; onSetFiles?: (master: string, revised: string, bulk: boolean) => void }
 
 const recentRuns = [
   {
@@ -107,7 +107,7 @@ function StatusBadge({ status }: { status: string | null }) {
 
 import { useState } from 'react'
 
-export default function ProofreaderDashboardScreen({ onNavigate, onSetLrfFlowActive }: Props) {
+export default function ProofreaderDashboardScreen({ onNavigate, onSetLrfFlowActive, onSetFiles }: Props) {
   const [expandedRows, setExpandedRows] = useState<Record<number, boolean>>({})
   const [workflowFilter, setWorkflowFilter] = useState<'ALL' | 'VISUAL COMPARISON' | 'PROOF READING'>('ALL')
   const [searchQuery, setSearchQuery] = useState('')
@@ -350,8 +350,10 @@ export default function ProofreaderDashboardScreen({ onNavigate, onSetLrfFlowAct
                         <div className="flex items-center gap-1.5">
                           <button
                             onClick={() => {
-                              onSetLrfFlowActive(run.workflow === 'PROOF READING');
-                              onNavigate('analysis');
+                              const isBulk = run.mode === 'BULK'
+                              onSetFiles?.(isBulk ? 'Master.pdf' : run.master, isBulk ? 'Revised.pdf' : run.revised, isBulk)
+                              onSetLrfFlowActive(run.workflow === 'PROOF READING')
+                              onNavigate('analysis')
                             }}
                             className="flex items-center justify-center rounded-lg hover:bg-slate-200 transition-colors cursor-pointer"
                             style={{ width: 26, height: 26, backgroundColor: C.grayBg }}
