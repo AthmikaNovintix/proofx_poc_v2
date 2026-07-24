@@ -402,15 +402,15 @@ export default function ProofreaderDashboardScreen({ onNavigate, onSetLrfFlowAct
                             </div>
                             <div className="flex flex-col gap-2">
                               <div className="grid grid-cols-12 py-1.5 text-slate-600 items-center">
-                                <div className="col-span-5">additional changes master.pdf</div>
-                                <div className="col-span-5">additional changes revised.pdf</div>
+                                <div className="col-span-5">Master.pdf</div>
+                                <div className="col-span-5">Revised.pdf</div>
                                 <div className="col-span-2 text-right">
                                   <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 font-bold text-[10px]">DONE</span>
                                 </div>
                               </div>
                               <div className="grid grid-cols-12 py-1.5 text-slate-600 items-center">
-                                <div className="col-span-5">Master.pdf</div>
-                                <div className="col-span-5">Revised.pdf</div>
+                                <div className="col-span-5">additional changes master.pdf</div>
+                                <div className="col-span-5">additional changes revised.pdf</div>
                                 <div className="col-span-2 text-right">
                                   <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 font-bold text-[10px]">DONE</span>
                                 </div>

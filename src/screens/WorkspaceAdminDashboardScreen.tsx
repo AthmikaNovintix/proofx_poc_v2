@@ -455,8 +455,8 @@ export default function WorkspaceAdminDashboardScreen({ onNavigate, onSelectProo
                               </div>
                               <div className="flex flex-col gap-2">
                                 {[
-                                  { m: 'additional changes master.pdf', r: 'additional changes revised.pdf' },
                                   { m: 'Master.pdf', r: 'Revised.pdf' },
+                                  { m: 'additional changes master.pdf', r: 'additional changes revised.pdf' },
                                 ].map((f, fi) => (
                                   <div key={fi} className="grid grid-cols-12 py-1.5 text-slate-600 items-center">
                                     <div className="col-span-5">{f.m}</div>
