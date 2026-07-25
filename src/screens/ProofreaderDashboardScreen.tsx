@@ -15,7 +15,7 @@ const recentRuns = [
     pairs: 2,
     skipped: 0,
     findings: 12,
-    workflow: 'VISUAL COMPARISON',
+    workflow: 'PROOF READING',
     status: 'PASS',
   },
   {
@@ -26,7 +26,7 @@ const recentRuns = [
     pairs: 2,
     skipped: 0,
     findings: 1,
-    workflow: 'VISUAL COMPARISON',
+    workflow: 'PROOF READING',
     status: 'PASS',
   },
   {

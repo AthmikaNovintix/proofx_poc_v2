@@ -591,12 +591,20 @@ export default function AnalysisScreen({ onNavigate, previousScreen, lrfFlowActi
 
   const handleExport = () => {
     setExporting(true)
-    const reportFile = (bulkMode && lrfFlowActive)
+    const reportFile = (isTwentyPairs && !lrfFlowActive)
+      ? '/ProofX_Bulk_Report_20Pairs.pdf'
+      : (isTwentyPairs && lrfFlowActive)
+      ? '/ProofX_Bulk_LRF_Report_20Pairs.pdf'
+      : (bulkMode && lrfFlowActive)
       ? '/ProofX_Bulk_LRF_Report.pdf'
       : bulkMode
       ? '/ProofX_Bulk_Report.pdf'
       : '/ProofX_Report.pdf'
-    const fileName = (bulkMode && lrfFlowActive)
+    const fileName = (isTwentyPairs && !lrfFlowActive)
+      ? 'ProofX_Bulk_Report_20Pairs.pdf'
+      : (isTwentyPairs && lrfFlowActive)
+      ? 'ProofX_Bulk_LRF_Report_20Pairs.pdf'
+      : (bulkMode && lrfFlowActive)
       ? 'ProofX_Bulk_LRF_Report.pdf'
       : bulkMode
       ? 'ProofX_Bulk_Report.pdf'

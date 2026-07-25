@@ -12,8 +12,8 @@ type Props = {
 
 const rows = [
   { datetime: 'Jul 23, 2026, 02:02 PM', master: 'Master.pdf', revised: 'Revised.pdf', mode: 'SINGLE', pairs: 1, skipped: 0, findings: 0, workflow: 'PROOF READING', status: 'PASS', expandable: false, bulkMasterKey: 'Master.pdf', bulkRevisedKey: 'Revised.pdf' },
-  { datetime: 'Jul 21, 2026, 11:52 AM', master: '→ 2 files', revised: '→ 2 files', mode: 'BULK', pairs: 2, skipped: 0, findings: 12, workflow: 'VISUAL COMPARISON', status: 'PASS', expandable: true, bulkMasterKey: 'Master.pdf', bulkRevisedKey: 'Revised.pdf' },
-  { datetime: 'Jul 21, 2026, 10:52 AM', master: '→ 2 files', revised: '→ 2 files', mode: 'BULK', pairs: 2, skipped: 0, findings: 1, workflow: 'VISUAL COMPARISON', status: 'PASS', expandable: true, bulkMasterKey: 'Master.pdf', bulkRevisedKey: 'Revised.pdf' },
+  { datetime: 'Jul 21, 2026, 11:52 AM', master: '→ 2 files', revised: '→ 2 files', mode: 'BULK', pairs: 2, skipped: 0, findings: 12, workflow: 'PROOF READING', status: 'PASS', expandable: true, bulkMasterKey: 'Master.pdf', bulkRevisedKey: 'Revised.pdf' },
+  { datetime: 'Jul 21, 2026, 10:52 AM', master: '→ 2 files', revised: '→ 2 files', mode: 'BULK', pairs: 2, skipped: 0, findings: 1, workflow: 'PROOF READING', status: 'PASS', expandable: true, bulkMasterKey: 'Master.pdf', bulkRevisedKey: 'Revised.pdf' },
   { datetime: 'Jul 17, 2026, 08:17 PM', master: '→ 2 files', revised: '→ 2 files', mode: 'BULK', pairs: 2, skipped: 1, findings: 4, workflow: 'VISUAL COMPARISON', status: 'PASS', expandable: true, bulkMasterKey: 'Master.pdf', bulkRevisedKey: 'Revised.pdf' },
   { datetime: 'Jul 14, 2026, 03:45 PM', master: 'LCN-label.pdf', revised: 'LCN-label-v2.pdf', mode: 'SINGLE', pairs: 1, skipped: 0, findings: 5, workflow: 'PROOF READING', status: 'PASS', expandable: false, bulkMasterKey: 'LCN-label.pdf', bulkRevisedKey: 'LCN-label-v2.pdf' },
   { datetime: 'Jul 10, 2026, 10:20 AM', master: '→ 2 files', revised: '→ 2 files', mode: 'BULK', pairs: 2, skipped: 0, findings: 9, workflow: 'VISUAL COMPARISON', status: 'PASS', expandable: true, bulkMasterKey: 'Master.pdf', bulkRevisedKey: 'Revised.pdf' },
