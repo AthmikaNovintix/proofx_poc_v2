@@ -303,9 +303,9 @@ export default function ChangeRequestFormScreen({ onNavigate, onSaveLrf }: Props
       <NavBar
         showBack
         onBack={() => onNavigate('proofreader-dashboard')}
-        title="Label Requirement Form"
+        title="Change Request Form"
         steps={[
-          { label: 'Label Requirement Form', active: true },
+          { label: 'Change Request Form', active: true },
           { label: 'Upload Labels' },
           { label: 'Analysis' },
         ]}
@@ -341,7 +341,7 @@ export default function ChangeRequestFormScreen({ onNavigate, onSaveLrf }: Props
             <div className="border-b border-gray-100 px-6 py-4 flex items-center justify-between bg-gray-50/50">
               <div>
                 <h1 className="text-base font-bold text-gray-900 uppercase tracking-wider">
-                  Label Requirement Form
+                  Change Request Form
                 </h1>
                 <p className="text-xs text-gray-500 mt-0.5">
                   Define required changes to be validated against comparator output

@@ -38,10 +38,17 @@ const rows = [
   { datetime: 'Jul 17, 2026, 08:17 PM', proofreader: 'Dhivya',   master: '→ 2 files',       revised: '→ 2 files',        mode: 'BULK',   pairs: 2, skipped: 1, findings: 4,  workflow: 'VISUAL COMPARISON', status: 'PASS', expandable: true  },
 ]
 
-const bulkFiles = Array.from({ length: 20 }, (_, i) => ({
-  name: `Label_${String(i + 1).padStart(2, '0')}_Master.pdf`,
-  size: `${(280 + Math.floor(Math.sin(i) * 80 + 80)).toFixed(1)} KB`
-}))
+const pairNames = [
+  { m: 'Master.pdf', r: 'Revised.pdf' },
+  { m: 'additional changes master.pdf', r: 'additional changes revised.pdf' },
+]
+
+function getPairFiles(row: { pairs: number; skipped: number }) {
+  return pairNames.slice(0, row.pairs).map((f, i) => ({
+    ...f,
+    status: i < row.skipped ? 'SKIPPED' : 'DONE',
+  }))
+}
 
 export default function AdminHistoryScreen({
   onNavigate,
@@ -273,30 +280,34 @@ export default function AdminHistoryScreen({
                         </button>
                       </td>
                     </tr>
-                    {/* Expanded bulk rows */}
+                    {/* Expanded pair breakdown */}
                     {expandedRows.has(i) && row.expandable && (
-                      bulkFiles.map((f, fi) => (
-                        <tr
-                          key={`${i}-${fi}`}
-                          style={{
-                            backgroundColor: C.grayBg,
-                            borderBottom: fi < bulkFiles.length - 1 ? `1px solid ${C.border}` : `2px solid ${C.border}`,
-                          }}
-                        >
-                          <td />
-                          <td className="px-3 py-2 pl-6" colSpan={2}>
-                            <div className="flex items-center gap-2">
-                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" stroke={C.muted} strokeWidth="1.6" />
-                                <path d="M14 2v6h6" stroke={C.muted} strokeWidth="1.6" strokeLinejoin="round" />
-                              </svg>
-                              <span className="text-xs" style={{ color: C.text }}>{f.name}</span>
-                              <span className="text-xs" style={{ color: C.muted }}>{f.size}</span>
+                      <tr style={{ backgroundColor: C.grayBg, borderBottom: `2px solid ${C.border}` }}>
+                        <td colSpan={isWorkspaceAdmin ? 13 : 14} className="px-8 py-4">
+                          <div className="w-full text-xs">
+                            <div className="grid grid-cols-12 font-bold mb-2 uppercase text-slate-400 tracking-wider">
+                              <div className="col-span-5">Master</div>
+                              <div className="col-span-5">Revised</div>
+                              <div className="col-span-2 text-right">Status</div>
                             </div>
-                          </td>
-                          <td colSpan={isWorkspaceAdmin ? 10 : 11} />
-                        </tr>
-                      ))
+                            <div className="flex flex-col gap-2">
+                              {getPairFiles(row).map((f, fi) => (
+                                <div key={fi} className="grid grid-cols-12 py-1.5 text-slate-600 items-center">
+                                  <div className="col-span-5">{f.m}</div>
+                                  <div className="col-span-5">{f.r}</div>
+                                  <div className="col-span-2 text-right">
+                                    {f.status === 'SKIPPED' ? (
+                                      <span className="px-2 py-0.5 rounded-full bg-red-50 text-red-600 border border-red-100 font-bold text-[10px]">SKIPPED</span>
+                                    ) : (
+                                      <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 font-bold text-[10px]">DONE</span>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
                     )}
                   </Fragment>
                 ))

@@ -570,7 +570,7 @@ function ProcessingModal({
   const steps = isAnalysing ? ANALYSIS_STEPS : PRE_STEPS;
 
   const pairText = totalPairs === 1 ? '1 pair' : `${totalPairs} pairs`;
-  const title = isAnalysing ? `Analysing ${pairText}` : `Pre-processing ${pairText}`;
+  const title = isAnalysing ? `Analysing ${pairText}` : `Verifying ${pairText} of labels for Analysis`;
 
   const activePairIndex = (isPreprocessing || isAnalysing)
     ? (phase as { type: string; pairIndex: number }).pairIndex

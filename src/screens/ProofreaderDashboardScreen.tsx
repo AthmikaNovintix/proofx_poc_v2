@@ -130,14 +130,14 @@ export default function ProofreaderDashboardScreen({ onNavigate, onSetLrfFlowAct
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-3">
             <span className="text-xs font-semibold tracking-widest uppercase" style={{ color: C.muted }}>
-              ● Deterministic · No ML · Audit-ready
+              {/* ● Deterministic · No ML · Audit-ready */}
             </span>
           </div>
           <h1 className="text-3xl font-bold mb-2" style={{ color: C.text }}>
             Select your workflow
           </h1>
           <p className="text-sm" style={{ color: C.muted, maxWidth: 480, margin: '0 auto' }}>
-            Compare labels and flag differences — run a quick comparison or validate against a Label Requirement Form.
+            Compare labels and flag differences — run a quick comparison or validate against a Change Request Form.
           </p>
         </div>
 
@@ -198,10 +198,10 @@ export default function ProofreaderDashboardScreen({ onNavigate, onSetLrfFlowAct
             </div>
             <h2 className="font-bold text-base mb-2 text-gray-900">Label proof reading</h2>
             <p className="text-sm mb-4 text-gray-500 leading-relaxed">
-              Begin with a Label Requirement Form to declare expected changes. Every finding is automatically classified as Expected or Unexpected.
+              Begin with a Change Request Form to declare expected changes. Every finding is automatically classified as Expected or Unexpected.
             </p>
             <ul className="flex flex-col gap-2 mb-6">
-              {['Declare expected changes upfront', 'Auto-classify findings as Expected / Unexpected', 'Change priorities with severity levels', 'Audit-ready LRF validation trail'].map(f => (
+              {['Declare expected changes upfront', 'Auto-classify findings as Expected / Unexpected', 'Change priorities with severity levels', 'Audit-ready CRF validation trail'].map(f => (
                 <li key={f} className="flex items-center gap-2 text-sm text-gray-500">
                   <CheckCircle2 size={16} className="text-[#1C2E59] shrink-0" />
                   <span>{f}</span>

@@ -129,7 +129,7 @@ export default function WorkspaceAdminDashboardScreen({ onNavigate, onSelectProo
   return (
     <div className="flex flex-col h-screen overflow-hidden animate-fade-in" style={{ backgroundColor: C.bg }}>
       <NavBar
-        title="Dashboard"
+        title="Workspace Admin Dashboard"
         showProfile
         onProfileClick={() => onNavigate('profile')}
         onLogout={() => onNavigate('login')}

@@ -298,7 +298,7 @@ export default function UploadLrfScreen({ lrfData, onNavigate, onSetLrfFlowActiv
           onBack={() => onNavigate('change-request-form')}
           title="Review & Upload"
           steps={[
-            { label: 'Label Requirement Form', done: true },
+            { label: 'Change Request Form', done: true },
             { label: 'Upload Labels', active: true },
             { label: 'Analysis' },
           ]}
@@ -315,7 +315,7 @@ export default function UploadLrfScreen({ lrfData, onNavigate, onSetLrfFlowActiv
                 Review &amp; Upload Labels
               </h1>
               <p className="text-sm text-gray-500 mt-1">
-                Verify the LRF details below, then upload the master and revised labels to run the comparison.
+                Verify the CRF details below, then upload the master and revised labels to run the comparison.
               </p>
             </div>
             <button
@@ -323,12 +323,12 @@ export default function UploadLrfScreen({ lrfData, onNavigate, onSetLrfFlowActiv
               className="flex items-center gap-2 border border-gray-300 bg-white px-4 py-2 text-xs font-semibold uppercase tracking-wider text-gray-700 hover:bg-gray-50 transition-colors shadow-sm rounded"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
-              Edit LRF
+              Edit CRF
             </button>
           </div>
 
           <div className="grid grid-cols-5 gap-6">
-            {/* Left: LRF summary */}
+            {/* Left: CRF summary */}
             <div className="col-span-3 space-y-4">
               {/* Metadata card */}
               <div className="bg-white border border-gray-200 shadow-sm rounded">
@@ -515,7 +515,7 @@ export default function UploadLrfScreen({ lrfData, onNavigate, onSetLrfFlowActiv
                   {ready && (
                     <div className="flex items-center gap-2 text-xs text-green-700 font-semibold bg-green-50 border border-green-200 px-3 py-2 rounded">
                       <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
-                      {mode === 'bulk' ? `${pairCount} pair${pairCount !== 1 ? 's' : ''} ready` : 'Both labels ready — LRF validation will run'}
+                      {mode === 'bulk' ? `${pairCount} pair${pairCount !== 1 ? 's' : ''} ready` : 'Both labels ready — CRF validation will run'}
                     </div>
                   )}
                 </div>
@@ -844,7 +844,7 @@ function ProcessingModal({
   const steps = isAnalysing ? ANALYSIS_STEPS : PRE_STEPS;
 
   const pairText = totalPairs === 1 ? '1 pair' : `${totalPairs} pairs`;
-  const title = isAnalysing ? `Analysing ${pairText}` : `Pre-processing ${pairText}`;
+  const title = isAnalysing ? `Analysing ${pairText}` : `Verifying ${pairText} of labels for Analysis`;
 
   const activePairIndex = (isPreprocessing || isAnalysing)
     ? (phase as { type: string; pairIndex: number }).pairIndex
