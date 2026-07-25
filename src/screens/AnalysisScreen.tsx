@@ -599,7 +599,9 @@ export default function AnalysisScreen({ onNavigate, previousScreen, lrfFlowActi
       ? '/ProofX_Bulk_LRF_Report.pdf'
       : bulkMode
       ? '/ProofX_Bulk_Report.pdf'
-      : '/ProofX_Report.pdf'
+      : lrfFlowActive
+      ? '/ProofX_Report.pdf'
+      : '/ProofX_Report_VisualComparison.pdf'
     const fileName = (isTwentyPairs && !lrfFlowActive)
       ? 'ProofX_Bulk_Report_20Pairs.pdf'
       : (isTwentyPairs && lrfFlowActive)
@@ -608,7 +610,9 @@ export default function AnalysisScreen({ onNavigate, previousScreen, lrfFlowActi
       ? 'ProofX_Bulk_LRF_Report.pdf'
       : bulkMode
       ? 'ProofX_Bulk_Report.pdf'
-      : 'ProofX_Report.pdf'
+      : lrfFlowActive
+      ? 'ProofX_Report.pdf'
+      : 'ProofX_Report_VisualComparison.pdf'
     const a = document.createElement('a')
     a.href = reportFile
     a.download = fileName
