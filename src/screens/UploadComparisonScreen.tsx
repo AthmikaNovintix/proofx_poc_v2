@@ -26,7 +26,7 @@ type ModalPhase =
   | { type: 'preprocessing-alert' }
   | { type: 'analysing'; pairIndex: number; step: number };
 
-const PRE_STEPS = ['Uploading files', 'Rendering files', 'Calibrating resolution', 'Aligning pages'];
+const PRE_STEPS = ['Rendering files', 'Calibrating resolution', 'Aligning pages'];
 const ANALYSIS_STEPS = [
   'Uploading files',
   'Rendering files',

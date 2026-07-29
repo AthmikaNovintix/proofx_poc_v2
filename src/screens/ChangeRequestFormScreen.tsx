@@ -1,12 +1,12 @@
 import { useState, useCallback, useEffect, useRef } from "react";
-import { Save, ArrowLeft, ArrowRight } from "lucide-react";
+import { Save, ArrowRight } from "lucide-react";
 import NavBar from "@/components/NavBar";
 import LRFCategoryTabs from "@/components/LRFCategoryTabs";
 import LRFAttributeGroup from "@/components/LRFAttributeGroup";
 import LRFSummaryBar from "@/components/LRFSummaryBar";
 import {
   LRF_CATEGORIES,
-  LRF_ATTRIBUTE_LOOKUP,
+  LRF_CATEGORY_ORDER,
   type LRFCategoryId,
   type LRFAttributeDef,
 } from "@/data/lrfAttributes";
@@ -29,9 +29,7 @@ export default function ChangeRequestFormScreen({ onNavigate, onSaveLrf }: Props
   const [requestedBy,   setRequestedBy]   = useState("Athmika");
   const [date,          setDate]          = useState("2026-07-22");
 
-  // Label version split into two boxes (like LabelIQ)
-  const parsedFrom = labelVersion.includes("→") ? labelVersion.split("→")[0].trim() : labelVersion;
-  const parsedTo   = labelVersion.includes("→") ? labelVersion.split("→")[1]?.trim() ?? "" : "";
+  // Label version split into two boxes
   const [labelFrom, setLabelFrom] = useState("Rev B");
   const [labelTo,   setLabelTo]   = useState("Rev C");
 
@@ -42,48 +40,20 @@ export default function ChangeRequestFormScreen({ onNavigate, onSaveLrf }: Props
 
   const [activeCategory,    setActiveCategory]    = useState<LRFCategoryId | null>("text");
   const [showDraftBanner,   setShowDraftBanner]   = useState(false);
-
-  // Prefilled change request list
-  const [changeList, setChangeList] = useState<any[]>([
-    {
-      id: 'txt_1',
-      category: 'TEXT',
-      name: 'Manufacture Address',
-      changeType: 'Modify',
-      fromValue: 'Medos International SARL Chemin-Blanc38 2400LeLocle,Switzerland',
-      toValue: '1302 Wrights Lane East, West Chester,PA19380, USA(Craniomaxillofacial)'
-    },
-    {
-      id: 'txt_2',
-      category: 'TEXT',
-      name: 'EC Rep Name',
-      changeType: 'Modify',
-      fromValue: 'EC',
-      toValue: 'EU'
-    },
-    {
-      id: 'txt_3',
-      category: 'TEXT',
-      name: 'eIFU URL',
-      changeType: 'Modify',
-      fromValue: 'www.e-ifu.com/symbols-glossary',
-      toValue: 'www.e-depuysynthes-ifu.com/symbols-glossary'
-    },
-    {
-      id: 'gfx_1',
-      category: 'GRAPHICS',
-      name: 'Company logo',
-      changeType: 'Modify',
-      fromValue: '',
-      toValue: ''
-    }
-  ]);
+  const [changes,           setChanges]           = useState<Record<string, LRFChangeData>>({
+    manufacturer_addr: { changeType: "Modify", oldValue: "Medos International SARL Chemin-Blanc38 2400 Le Locle, Switzerland", newValue: "1302 Wrights Lane East, West Chester, PA 19380, USA (Craniomaxillofacial)" },
+    ecrep_name:        { changeType: "Modify", oldValue: "EC", newValue: "EU" },
+    eifu_url:          { changeType: "Modify", oldValue: "www.e-ifu.com/symbols-glossary", newValue: "www.e-depuysynthes-ifu.com/symbols-glossary" },
+    logo_change:       { changeType: "Modify", oldValue: "Current_version_logo.jpg", newValue: "Revised_logo.jpg" },
+  });
+  const [customAttributes,  setCustomAttributes]  = useState<Record<string, LRFAttributeDef[]>>({});
 
   const attributePanelRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (localStorage.getItem(DRAFT_KEY)) setShowDraftBanner(true);
-  }, []);
+  // Draft banner disabled for now
+  // useEffect(() => {
+  //   if (localStorage.getItem(DRAFT_KEY)) setShowDraftBanner(true);
+  // }, []);
 
   const restoreDraft = () => {
     try {
@@ -98,24 +68,41 @@ export default function ChangeRequestFormScreen({ onNavigate, onSaveLrf }: Props
         const to   = draft.metadata.labelVersion?.split("→")[1]?.trim() ?? "";
         setLabelFrom(from); setLabelTo(to);
       }
-      if (draft.changeList) {
-        setChangeList(draft.changeList);
-      }
+      if (draft.changes)          setChanges(draft.changes);
+      if (draft.customAttributes) setCustomAttributes(draft.customAttributes);
     } catch {}
     setShowDraftBanner(false);
   };
 
   const saveDraft = () => {
+    const serializableChanges = Object.fromEntries(
+      Object.entries(changes).map(([k, v]) => [k, { changeType: v.changeType, oldValue: v.oldValue, newValue: v.newValue }])
+    );
     localStorage.setItem(DRAFT_KEY, JSON.stringify({
       metadata: { crNumber, partNumber, labelVersion, productName, requestedBy, date },
-      changeList
+      changes: serializableChanges, customAttributes,
     }));
   };
 
+  const getCountForCategory = useCallback(
+    (catId: LRFCategoryId) => {
+      const cat = LRF_CATEGORIES[catId];
+      let count = 0;
+      for (const group of cat.groups) {
+        const allAttrs = [...group.attributes, ...(customAttributes[group.id] || [])];
+        for (const attr of allAttrs) {
+          if (changes[attr.id]?.changeType) count++;
+        }
+      }
+      return count;
+    },
+    [changes, customAttributes]
+  );
+
   const changeCounts: Record<LRFCategoryId, number> = {
-    text:     changeList.filter(c => c.category === 'TEXT').length,
-    graphics: changeList.filter(c => c.category === 'GRAPHICS').length,
-    barcode:  changeList.filter(c => c.category === 'BARCODE').length,
+    text:     getCountForCategory("text"),
+    graphics: getCountForCategory("graphics"),
+    barcode:  getCountForCategory("barcode"),
   };
   const totalChanges = Object.values(changeCounts).reduce((a, b) => a + b, 0);
 
@@ -129,14 +116,88 @@ export default function ChangeRequestFormScreen({ onNavigate, onSaveLrf }: Props
     }
   };
 
-  const handleNext = () => {
-    const list = changeList.map(c => ({
-      name: c.name || 'Custom Attribute',
-      category: c.category,
-      changeType: c.changeType.toUpperCase(),
-      fromValue: c.changeType === 'Add' ? '' : c.fromValue,
-      toValue: c.changeType === 'Delete' ? '' : c.toValue,
+  const handleChangeType = (attrId: string, value: string) => {
+    setChanges((prev) => ({
+      ...prev,
+      [attrId]: { ...prev[attrId], changeType: value, oldValue: prev[attrId]?.oldValue || "", newValue: prev[attrId]?.newValue || "" },
     }));
+  };
+
+  const handleOldValue = (attrId: string, value: string) => {
+    setChanges((prev) => ({
+      ...prev,
+      [attrId]: { ...prev[attrId], oldValue: value, newValue: prev[attrId]?.newValue || "", changeType: prev[attrId]?.changeType || "" },
+    }));
+  };
+
+  const handleNewValue = (attrId: string, value: string) => {
+    setChanges((prev) => ({
+      ...prev,
+      [attrId]: { ...prev[attrId], newValue: value, oldValue: prev[attrId]?.oldValue || "", changeType: prev[attrId]?.changeType || "" },
+    }));
+  };
+
+  const handleOldFile = (attrId: string, file: File) => {
+    setChanges((prev) => ({
+      ...prev,
+      [attrId]: { ...prev[attrId], oldFile: file, oldValue: prev[attrId]?.oldValue || "", newValue: prev[attrId]?.newValue || "", changeType: prev[attrId]?.changeType || "" },
+    }));
+  };
+
+  const handleNewFile = (attrId: string, file: File) => {
+    setChanges((prev) => ({
+      ...prev,
+      [attrId]: { ...prev[attrId], newFile: file, oldValue: prev[attrId]?.oldValue || "", newValue: prev[attrId]?.newValue || "", changeType: prev[attrId]?.changeType || "" },
+    }));
+  };
+
+  const handleClear = (attrId: string, isCustom: boolean) => {
+    if (isCustom) {
+      setCustomAttributes((prev) => {
+        const next = { ...prev };
+        for (const key of Object.keys(next)) {
+          next[key] = next[key].filter((a) => a.id !== attrId);
+        }
+        return next;
+      });
+      setChanges((prev) => { const next = { ...prev }; delete next[attrId]; return next; });
+    } else {
+      setChanges((prev) => ({ ...prev, [attrId]: { changeType: "", oldValue: "", newValue: "" } }));
+    }
+  };
+
+  const handleAddCustom = (groupId: string, name: string, changeType: string, oldValue: string, newValue: string) => {
+    const id = `custom_${groupId}_${Date.now()}`;
+    setCustomAttributes((prev) => ({
+      ...prev,
+      [groupId]: [...(prev[groupId] || []), { id, label: name, placeholder: "Custom parameter", isCustom: true }],
+    }));
+    if (changeType) {
+      setChanges((prev) => ({ ...prev, [id]: { changeType, oldValue, newValue } }));
+    }
+  };
+
+  const handleNext = () => {
+    // Build a flat list from the structured changes for onSaveLrf
+    const list: any[] = [];
+    for (const catId of LRF_CATEGORY_ORDER) {
+      const cat = LRF_CATEGORIES[catId];
+      for (const group of cat.groups) {
+        const allAttrs = [...group.attributes, ...(customAttributes[group.id] || [])];
+        for (const attr of allAttrs) {
+          const change = changes[attr.id];
+          if (change?.changeType) {
+            list.push({
+              name: attr.label,
+              category: catId.toUpperCase(),
+              changeType: change.changeType.toUpperCase(),
+              fromValue: change.changeType === 'Add' ? '' : (change.oldValue || ''),
+              toValue: change.changeType === 'Remove' ? '' : (change.newValue || ''),
+            });
+          }
+        }
+      }
+    }
 
     onSaveLrf({
       crNumber: crNumber || 'CR-2026-0041',
@@ -147,155 +208,17 @@ export default function ChangeRequestFormScreen({ onNavigate, onSaveLrf }: Props
       revTo: labelTo || 'Rev C',
       requestedBy: requestedBy || 'Athmika',
       count: list.length || 4,
-      list: list
+      list: list.length > 0 ? list : [
+        { name: 'Manufacturer address', category: 'TEXT', changeType: 'MODIFY', fromValue: 'Medos International SARL', toValue: '1302 Wrights Lane East' },
+        { name: 'EC Rep Name', category: 'TEXT', changeType: 'MODIFY', fromValue: 'EC', toValue: 'EU' },
+        { name: 'eIFU URL', category: 'TEXT', changeType: 'MODIFY', fromValue: 'www.e-ifu.com/symbols-glossary', toValue: 'www.e-depuysynthes-ifu.com/symbols-glossary' },
+        { name: 'Company logo', category: 'GRAPHICS', changeType: 'MODIFY', fromValue: '', toValue: '' },
+      ]
     });
     onNavigate('upload-lrf');
   };
 
   const activeCat = activeCategory ? LRF_CATEGORIES[activeCategory] : null;
-
-  const renderCategoryChanges = (catId: LRFCategoryId) => {
-    const categoryUpper = catId.toUpperCase();
-    const items = changeList.filter(item => item.category === categoryUpper);
-
-    return (
-      <div ref={attributePanelRef} className="space-y-4">
-        {items.map((item) => (
-          <div key={item.id} className="bg-white border border-gray-200 shadow-sm p-6 space-y-4 border-t-2 border-[#1C2E59]">
-            <div className="flex justify-between items-center">
-              <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Change Request</span>
-              <button
-                onClick={() => {
-                  setChangeList(prev => prev.filter(c => c.id !== item.id));
-                }}
-                className="text-gray-400 hover:text-red-600 transition-colors cursor-pointer text-xs flex items-center gap-1"
-              >
-                Delete
-              </button>
-            </div>
-            
-            <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">
-                Attribute name (optional)
-              </label>
-              <input
-                value={item.name}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  setChangeList(prev => prev.map(c => c.id === item.id ? { ...c, name: val } : c));
-                }}
-                placeholder="e.g. Product identification"
-                className="h-10 w-full border border-gray-300 px-3 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#1C2E59]/25 rounded-md"
-              />
-            </div>
-
-            <div className="grid grid-cols-3 gap-4 items-end">
-              <div>
-                <label className="block text-xs font-medium text-gray-500 mb-1">
-                  Change type
-                </label>
-                <select
-                  value={item.changeType}
-                  onChange={(e) => {
-                    const val = e.target.value as any;
-                    setChangeList(prev => prev.map(c => c.id === item.id ? { ...c, changeType: val } : c));
-                  }}
-                  className="h-10 w-full border border-gray-300 px-3 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#1C2E59]/25 rounded-md"
-                >
-                  <option value="Add">Add</option>
-                  <option value="Delete">Delete</option>
-                  <option value="Modify">Modify</option>
-                </select>
-              </div>
-
-              {item.changeType === "Modify" ? (
-                <>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-500 mb-1">
-                      Old Value
-                    </label>
-                    <input
-                      value={item.fromValue}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        setChangeList(prev => prev.map(c => c.id === item.id ? { ...c, fromValue: val } : c));
-                      }}
-                      placeholder="Old value"
-                      className="h-10 w-full border border-gray-300 px-3 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#1C2E59]/25 rounded-md"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-500 mb-1">
-                      New Value
-                    </label>
-                    <input
-                      value={item.toValue}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        setChangeList(prev => prev.map(c => c.id === item.id ? { ...c, toValue: val } : c));
-                      }}
-                      placeholder="New value"
-                      className="h-10 w-full border border-gray-300 px-3 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#1C2E59]/25 rounded-md"
-                    />
-                  </div>
-                </>
-              ) : item.changeType === "Add" ? (
-                <div className="col-span-2">
-                  <label className="block text-xs font-medium text-gray-500 mb-1">
-                    New Value
-                  </label>
-                  <input
-                    value={item.toValue}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      setChangeList(prev => prev.map(c => c.id === item.id ? { ...c, toValue: val } : c));
-                    }}
-                    placeholder="New value"
-                    className="h-10 w-full border border-gray-300 px-3 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#1C2E59]/25 rounded-md"
-                  />
-                </div>
-              ) : (
-                <div className="col-span-2">
-                  <label className="block text-xs font-medium text-gray-500 mb-1">
-                    Old Value
-                  </label>
-                  <input
-                    value={item.fromValue}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      setChangeList(prev => prev.map(c => c.id === item.id ? { ...c, fromValue: val } : c));
-                    }}
-                    placeholder="Old value"
-                    className="h-10 w-full border border-gray-300 px-3 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#1C2E59]/25 rounded-md"
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
-
-        <button
-          onClick={() => {
-            const newId = `custom_${catId}_${Date.now()}`;
-            setChangeList(prev => [
-              ...prev,
-              {
-                id: newId,
-                category: categoryUpper as any,
-                name: '',
-                changeType: 'Modify',
-                fromValue: '',
-                toValue: ''
-              }
-            ]);
-          }}
-          className="w-full py-3 border border-dashed border-gray-300 hover:border-gray-400 text-sm font-semibold text-gray-600 hover:text-gray-900 bg-white flex items-center justify-center gap-2 cursor-pointer rounded-lg transition-colors"
-        >
-          + Add Parameter Change
-        </button>
-      </div>
-    );
-  };
 
   return (
     <div className="flex flex-col animate-fade-in" style={{ height: "100vh", overflow: "hidden", backgroundColor: C.bg }}>
@@ -303,9 +226,9 @@ export default function ChangeRequestFormScreen({ onNavigate, onSaveLrf }: Props
       <NavBar
         showBack
         onBack={() => onNavigate('proofreader-dashboard')}
-        title="Label Requirement Form"
+        title="Change Request Form"
         steps={[
-          { label: 'Label Requirement Form', active: true },
+          { label: 'Change Request Form', active: true },
           { label: 'Upload Labels' },
           { label: 'Analysis' },
         ]}
@@ -341,7 +264,7 @@ export default function ChangeRequestFormScreen({ onNavigate, onSaveLrf }: Props
             <div className="border-b border-gray-100 px-6 py-4 flex items-center justify-between bg-gray-50/50">
               <div>
                 <h1 className="text-base font-bold text-gray-900 uppercase tracking-wider">
-                  Label Requirement Form
+                  Change Request Form
                 </h1>
                 <p className="text-xs text-gray-500 mt-0.5">
                   Define required changes to be validated against comparator output
@@ -439,7 +362,31 @@ export default function ChangeRequestFormScreen({ onNavigate, onSaveLrf }: Props
 
           {/* Attribute Groups */}
           {activeCat && activeCategory && (
-            renderCategoryChanges(activeCategory)
+            <div
+              ref={attributePanelRef}
+              className="bg-white border border-gray-200 shadow-sm -mt-5"
+            >
+              <div className="border-t-2 border-[#1e2a52]">
+                {activeCat.groups.map((group) => (
+                  <LRFAttributeGroup
+                    key={group.id}
+                    groupId={group.id}
+                    name={group.name}
+                    attributes={group.attributes}
+                    changes={changes}
+                    customAttributes={customAttributes[group.id] || []}
+                    categoryId={activeCategory}
+                    onChangeType={handleChangeType}
+                    onOldValue={handleOldValue}
+                    onNewValue={handleNewValue}
+                    onOldFile={handleOldFile}
+                    onNewFile={handleNewFile}
+                    onClear={handleClear}
+                    onAddCustom={handleAddCustom}
+                  />
+                ))}
+              </div>
+            </div>
           )}
 
           <LRFSummaryBar counts={changeCounts} />
@@ -447,14 +394,7 @@ export default function ChangeRequestFormScreen({ onNavigate, onSaveLrf }: Props
       </div>
 
       {/* Footer */}
-      <div className="shrink-0 border-t border-[#e2e8f0] bg-white px-8 py-2.5 flex items-center justify-between gap-3 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
-        <button
-          onClick={() => onNavigate('proofreader-dashboard')}
-          className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition-colors cursor-pointer"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" />
-          Skip for now
-        </button>
+      <div className="shrink-0 border-t border-[#e2e8f0] bg-white px-8 py-2.5 flex items-center justify-end gap-3 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
         <div className="flex items-center gap-3">
           <button
             onClick={saveDraft}

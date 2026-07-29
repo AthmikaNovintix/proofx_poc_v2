@@ -64,7 +64,7 @@ type ModalPhase =
   | { type: 'preprocessing-alert' }
   | { type: 'analysing'; pairIndex: number; step: number };
 
-const PRE_STEPS = ['Uploading files', 'Rendering files', 'Calibrating resolution', 'Aligning pages'];
+const PRE_STEPS = ['Rendering files', 'Calibrating resolution', 'Aligning pages'];
 const ANALYSIS_STEPS = [
   'Uploading files',
   'Rendering files',
@@ -460,7 +460,7 @@ export default function UploadLrfScreen({ lrfData, onNavigate, onSetLrfFlowActiv
                     Upload both the master (current version) and revised (new version) labels.
                   </p>
 
-                  <div className="inline-flex bg-[#F1F3F4] border border-[#E0E0E0] rounded-full p-1">
+                  <div className="inline-flex bg-[#F1F3F4] border border-[#E0E0E0] rounded-full p-0.5">
                     {(["single", "bulk"] as const).map((m) => (
                       <button
                         key={m}
@@ -491,8 +491,8 @@ export default function UploadLrfScreen({ lrfData, onNavigate, onSetLrfFlowActiv
                           }
                         }}
                         className={`px-4 py-1 text-xs rounded-full transition-colors cursor-pointer ${mode === m
-                            ? "bg-white text-[#1C2E59] border border-[#E0E0E0] shadow-sm font-semibold"
-                            : "text-gray-400 hover:text-gray-600"
+                            ? "bg-white text-[#1C2E59] border border-[#E0E0E0] shadow-sm"
+                            : "text-gray-500 hover:text-gray-700"
                           }`}
                       >
                         {m === "single" ? "Single pair" : "Bulk upload"}
@@ -502,8 +502,8 @@ export default function UploadLrfScreen({ lrfData, onNavigate, onSetLrfFlowActiv
 
                   {mode === "single" ? (
                     <div className="space-y-4">
-                      <DropZone label="Master Labels" file={master} onFile={setMaster} onClear={() => setMaster(null)} variant="master" compact singleMode />
-                      <DropZone label="Revised Labels" file={revised} onFile={setRevised} onClear={() => setRevised(null)} variant="revised" compact singleMode />
+                      <DropZone label="Master label (current version)" file={master} onFile={setMaster} onClear={() => setMaster(null)} variant="master" compact singleMode />
+                      <DropZone label="Revised label (new version)" file={revised} onFile={setRevised} onClear={() => setRevised(null)} variant="revised" compact singleMode />
                     </div>
                   ) : (
                     <div className="space-y-4">
@@ -638,7 +638,7 @@ function DropZone({
     <div>
       <div className="flex items-center gap-2 mb-2">
         <span className="h-2 w-2 rounded-full flex-shrink-0" style={{ backgroundColor: accentColor }} />
-        <div className="text-xs font-bold uppercase tracking-wide" style={{ color: accentColor }}>{label}</div>
+        <div className="text-xs font-medium uppercase tracking-wide" style={{ color: accentColor }}>{label}</div>
       </div>
 
       <div
@@ -646,11 +646,11 @@ function DropZone({
         onDragLeave={() => setHover(false)}
         onDrop={(e) => { e.preventDefault(); setHover(false); handleFiles(e.dataTransfer.files); }}
         onClick={() => inputRef.current?.click()}
-        className={`bg-white border border-dashed border-gray-200 rounded-md flex flex-col items-center justify-center cursor-pointer transition-colors ${compact ? "h-24" : "h-36"}`}
+        className={`bg-white border border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center cursor-pointer transition-colors ${compact ? "h-24" : "h-36"}`}
         style={{ borderColor: hover ? accentColor : undefined, borderLeft: `3px solid ${accentColor}` }}
       >
         <Upload className="h-5 w-5 mb-2 text-gray-400" />
-        <div className="text-sm text-gray-700">Add more files</div>
+        <div className="text-sm text-gray-700">Add file</div>
         <div className="text-xs text-gray-400 mt-0.5">PDF or PNG</div>
         <input ref={inputRef} type="file" accept=".pdf,.png,application/pdf,image/png" className="hidden" onChange={(e) => handleFiles(e.target.files)} />
       </div>
@@ -665,10 +665,10 @@ function DropZone({
             <div className="flex-1 min-w-0">
               <div className="text-sm text-gray-800 truncate">{file.name}</div>
               <div className="text-xs text-gray-400">
-                {file.name === 'Master.pdf' ? '475.0 KB · 1 page'
-                  : file.name === 'Revised.pdf' ? '468.2 KB · 1 page'
-                    : file.name === 'additional changes master.pdf' ? '486.4 KB · 1 page'
-                      : file.name === 'additional changes revised.pdf' ? '478.4 KB · 1 page'
+                {file.name === 'Master.pdf' ? '475.0 KB'
+                  : file.name === 'Revised.pdf' ? '468.2 KB'
+                    : file.name === 'additional changes master.pdf' ? '486.4 KB'
+                      : file.name === 'additional changes revised.pdf' ? '478.4 KB'
                         : formatBytes(file.size)}
               </div>
             </div>
@@ -688,7 +688,7 @@ function DropZone({
                   {variant === 'master' ? 'additional changes master.pdf' : 'additional changes revised.pdf'}
                 </div>
                 <div className="text-xs text-gray-400">
-                  {variant === 'master' ? '486.4 KB · 1 page' : '478.4 KB · 1 page'}
+                  {variant === 'master' ? '486.4 KB' : '478.4 KB'}
                 </div>
               </div>
               <button onClick={handleClear} className="text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0 cursor-pointer" aria-label="Remove">
@@ -745,7 +745,7 @@ function MultiDropZone({
       <div className="flex items-center justify-between gap-2 mb-2">
         <div className="flex items-center gap-2">
           <span className="h-2 w-2 rounded-full flex-shrink-0" style={{ backgroundColor: accentColor }} />
-          <div className="text-xs font-bold uppercase tracking-wide" style={{ color: accentColor }}>{label}</div>
+          <div className="text-xs font-medium uppercase tracking-wide" style={{ color: accentColor }}>{label}</div>
         </div>
         <span className="text-[10px] text-gray-400 font-medium">{files.length} / {BULK_MAX_FILES}</span>
       </div>

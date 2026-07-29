@@ -93,7 +93,7 @@ export default function LRFAttributeRow({
               <select
                 value={changeType}
                 onChange={(e) => onChangeType(e.target.value)}
-                className="h-9 w-full rounded-none border border-gray-200 bg-white px-3 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1e2a52]/25"
+                className="h-9 w-full rounded-md border border-gray-200 bg-white px-3 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#1e2a52]/25"
               >
                 <option value="">— select —</option>
                 {changeTypes.map((ct) => (
@@ -110,7 +110,7 @@ export default function LRFAttributeRow({
                   value={oldValue}
                   onChange={(e) => onOldValue(e.target.value)}
                   placeholder="Current value on the master label"
-                  className="h-9 w-full rounded-none border border-gray-200 bg-white px-3 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1e2a52]/25"
+                  className="h-9 w-full rounded-md border border-gray-200 bg-white px-3 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1e2a52]/25"
                 />
               </div>
             )}
@@ -123,7 +123,7 @@ export default function LRFAttributeRow({
                   value={newValue}
                   onChange={(e) => onNewValue(e.target.value)}
                   placeholder={placeholder}
-                  className="h-9 w-full rounded-none border border-gray-200 bg-white px-3 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1e2a52]/25"
+                  className="h-9 w-full rounded-md border border-gray-200 bg-white px-3 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1e2a52]/25"
                 />
               </div>
             )}
@@ -136,7 +136,7 @@ export default function LRFAttributeRow({
                   value={newValue}
                   onChange={(e) => onNewValue(e.target.value)}
                   placeholder={placeholder}
-                  className="h-9 w-full rounded-none border border-gray-200 bg-white px-3 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1e2a52]/25"
+                  className="h-9 w-full rounded-md border border-gray-200 bg-white px-3 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#1e2a52]/25"
                 />
               </div>
             )}
@@ -144,8 +144,12 @@ export default function LRFAttributeRow({
             {showOldUpload && (
               <div className="flex-1">
                 <label className="block text-xs font-medium text-gray-400 mb-1">Old image</label>
-                <label className="flex items-center gap-2 h-9 rounded-none border border-dashed border-gray-200 bg-white px-3 text-sm text-gray-400 cursor-pointer hover:border-[#1e2a52] hover:text-gray-800 transition-colors">
-                  <Upload size={14} />
+                <label className={`flex items-center gap-2 h-9 rounded-md px-3 text-sm cursor-pointer transition-colors bg-white ${
+                  oldValue
+                    ? "border border-[#1e2a52] text-[#1e2a52] hover:border-[#1e2a52]/70"
+                    : "border border-dashed border-gray-200 text-gray-400 hover:border-[#1e2a52] hover:text-gray-800"
+                }`}>
+                  <Upload size={14} className="shrink-0" />
                   <span className="truncate">{oldValue || "Upload current image"}</span>
                   <input
                     type="file"
@@ -163,8 +167,12 @@ export default function LRFAttributeRow({
             {showNewUpload && (
               <div className="flex-1">
                 <label className="block text-xs font-medium text-gray-400 mb-1">New image</label>
-                <label className="flex items-center gap-2 h-9 rounded-none border border-dashed border-gray-200 bg-white px-3 text-sm text-gray-400 cursor-pointer hover:border-[#1e2a52] hover:text-gray-800 transition-colors">
-                  <Upload size={14} />
+                <label className={`flex items-center gap-2 h-9 rounded-md px-3 text-sm cursor-pointer transition-colors bg-white ${
+                  newValue
+                    ? "border border-[#1e2a52] text-[#1e2a52] hover:border-[#1e2a52]/70"
+                    : "border border-dashed border-gray-200 text-gray-400 hover:border-[#1e2a52] hover:text-gray-800"
+                }`}>
+                  <Upload size={14} className="shrink-0" />
                   <span className="truncate">{newValue || "Upload new image"}</span>
                   <input
                     type="file"
