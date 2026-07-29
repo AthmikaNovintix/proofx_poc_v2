@@ -59,8 +59,8 @@ const flashCards = [
 ]
 
 const historyRows = [
-  { datetime: 'Jul 22, 2026, 09:14 AM', proofreader: 'Dhivya',   master: '→ 2 files', revised: '→ 2 files', mode: 'BULK',   pairs: 2, findings: 7,  workflow: 'VISUAL COMPARISON', status: 'PASS' },
-  { datetime: 'Jul 21, 2026, 11:52 AM', proofreader: 'Athmika',  master: '→ 2 files', revised: '→ 2 files', mode: 'BULK',   pairs: 2, findings: 12, workflow: 'VISUAL COMPARISON', status: 'PASS' },
+  { datetime: 'Jul 22, 2026, 09:14 AM', proofreader: 'Dhivya',   master: '→ 2 files', revised: '→ 2 files', mode: 'BULK',   pairs: 2, findings: 7,  workflow: 'PROOF READING', status: 'PASS' },
+  { datetime: 'Jul 21, 2026, 11:52 AM', proofreader: 'Athmika',  master: '→ 2 files', revised: '→ 2 files', mode: 'BULK',   pairs: 2, findings: 12, workflow: 'PROOF READING', status: 'PASS' },
   { datetime: 'Jul 21, 2026, 10:28 AM', proofreader: 'Dhivya',   master: 'Master.pdf',  revised: 'Revised.pdf', mode: 'SINGLE', pairs: 1,  findings: 3,  workflow: 'PROOF READING',     status: 'PASS' },
   { datetime: 'Jul 20, 2026, 03:12 PM', proofreader: 'Shrvaani', master: '→ 2 files', revised: '→ 2 files', mode: 'BULK',   pairs: 2, findings: 0,  workflow: 'VISUAL COMPARISON', status: 'PASS' },
   { datetime: 'Jul 19, 2026, 08:44 AM', proofreader: 'Rooban',   master: 'LCN-label.pdf', revised: 'LCN-label-v2.pdf', mode: 'SINGLE', pairs: 1, findings: 5, workflow: 'PROOF READING', status: 'PASS' },
@@ -129,7 +129,7 @@ export default function WorkspaceAdminDashboardScreen({ onNavigate, onSelectProo
   return (
     <div className="flex flex-col h-screen overflow-hidden animate-fade-in" style={{ backgroundColor: C.bg }}>
       <NavBar
-        title="Dashboard"
+        title="Workspace Admin Dashboard"
         showProfile
         onProfileClick={() => onNavigate('profile')}
         onLogout={() => onNavigate('login')}

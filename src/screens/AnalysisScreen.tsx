@@ -591,16 +591,28 @@ export default function AnalysisScreen({ onNavigate, previousScreen, lrfFlowActi
 
   const handleExport = () => {
     setExporting(true)
-    const reportFile = (bulkMode && lrfFlowActive)
+    const reportFile = (isTwentyPairs && !lrfFlowActive)
+      ? '/ProofX_Bulk_Report_20Pairs.pdf'
+      : (isTwentyPairs && lrfFlowActive)
+      ? '/ProofX_Bulk_LRF_Report_20Pairs.pdf'
+      : (bulkMode && lrfFlowActive)
       ? '/ProofX_Bulk_LRF_Report.pdf'
       : bulkMode
       ? '/ProofX_Bulk_Report.pdf'
-      : '/ProofX_Report.pdf'
-    const fileName = (bulkMode && lrfFlowActive)
+      : lrfFlowActive
+      ? '/ProofX_Report.pdf'
+      : '/ProofX_Report_VisualComparison.pdf'
+    const fileName = (isTwentyPairs && !lrfFlowActive)
+      ? 'ProofX_Bulk_Report_20Pairs.pdf'
+      : (isTwentyPairs && lrfFlowActive)
+      ? 'ProofX_Bulk_LRF_Report_20Pairs.pdf'
+      : (bulkMode && lrfFlowActive)
       ? 'ProofX_Bulk_LRF_Report.pdf'
       : bulkMode
       ? 'ProofX_Bulk_Report.pdf'
-      : 'ProofX_Report.pdf'
+      : lrfFlowActive
+      ? 'ProofX_Report.pdf'
+      : 'ProofX_Report_VisualComparison.pdf'
     const a = document.createElement('a')
     a.href = reportFile
     a.download = fileName
@@ -713,52 +725,72 @@ export default function AnalysisScreen({ onNavigate, previousScreen, lrfFlowActi
           </aside>
         )}
 
-        {/* Left label panel */}
-        <LabelPanel
-          title={activeMasterName}
-          version="CURRENT VERSION LABEL"
-          variant="master"
-          findings={filteredFindings}
-          selectedFinding={expandedId}
-          zoom={masterZoom}
-          scrollRef={masterRef}
-          fileUrl={masterPdfPath}
-          loading={labelsLoading}
-          onReset={() => {
-            const fit = calcFit(masterRef.current)
-            setMasterZoom(fit)
-            masterRef.current?.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
-            if (syncScroll) {
-              setRevisedZoom(fit)
-              revisedRef.current?.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
-            }
-          }}
-        />
+        <div className="flex-1 flex flex-col min-w-0 min-h-0">
+          {/* Workflow indicator */}
+          <div
+            className="h-7 px-4 flex items-center justify-center flex-shrink-0 border-b border-[#E0E0E0]"
+            style={{ backgroundColor: '#F8F9FA' }}
+          >
+            <span
+              className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider"
+              style={{
+                backgroundColor: lrfFlowActive ? C.navyLight : C.orangeLight,
+                color: lrfFlowActive ? C.navy : C.orangeText,
+              }}
+            >
+              {lrfFlowActive ? 'Proof Reading' : 'Visual Comparison'}
+            </span>
+          </div>
 
-        {/* Divider */}
-        <div className="w-1 flex-shrink-0 self-stretch" style={{ backgroundColor: '#1C2E59' }} aria-hidden />
+          <div className="flex flex-1 min-h-0">
+            {/* Left label panel */}
+            <LabelPanel
+              title={activeMasterName}
+              version="CURRENT VERSION LABEL"
+              variant="master"
+              findings={filteredFindings}
+              selectedFinding={expandedId}
+              zoom={masterZoom}
+              scrollRef={masterRef}
+              fileUrl={masterPdfPath}
+              loading={labelsLoading}
+              onReset={() => {
+                const fit = calcFit(masterRef.current)
+                setMasterZoom(fit)
+                masterRef.current?.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+                if (syncScroll) {
+                  setRevisedZoom(fit)
+                  revisedRef.current?.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+                }
+              }}
+            />
 
-        {/* Right label panel */}
-        <LabelPanel
-          title={activeRevisedName}
-          version="NEW VERSION LABEL"
-          variant="revised"
-          findings={filteredFindings}
-          selectedFinding={expandedId}
-          zoom={revisedZoom}
-          scrollRef={revisedRef}
-          fileUrl={revisedPdfPath}
-          loading={labelsLoading}
-          onReset={() => {
-            const fit = calcFit(revisedRef.current)
-            setRevisedZoom(fit)
-            revisedRef.current?.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
-            if (syncScroll) {
-              setMasterZoom(fit)
-              masterRef.current?.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
-            }
-          }}
-        />
+            {/* Divider */}
+            <div className="w-1 flex-shrink-0 self-stretch" style={{ backgroundColor: '#1C2E59' }} aria-hidden />
+
+            {/* Right label panel */}
+            <LabelPanel
+              title={activeRevisedName}
+              version="NEW VERSION LABEL"
+              variant="revised"
+              findings={filteredFindings}
+              selectedFinding={expandedId}
+              zoom={revisedZoom}
+              scrollRef={revisedRef}
+              fileUrl={revisedPdfPath}
+              loading={labelsLoading}
+              onReset={() => {
+                const fit = calcFit(revisedRef.current)
+                setRevisedZoom(fit)
+                revisedRef.current?.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+                if (syncScroll) {
+                  setMasterZoom(fit)
+                  masterRef.current?.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+                }
+              }}
+            />
+          </div>
+        </div>
 
         {/* Findings sidebar */}
         <aside className="w-[400px] border-l border-[#E0E0E0] bg-white flex flex-col flex-shrink-0">
